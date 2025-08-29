@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/best_seller_trip_section.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/bg_container.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/footer_section.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/how_pay_section.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/most_popular_destination.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/slide_fade_animation.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/time_descover_widget.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/tour_filter.dart';
+import 'offer_container_section.dart';
+
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final height = constraints.maxHeight;
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              BackgroundContainer(
+                child: Column(
+                  children: [
+                    const OfferContainerSection(),
+                    const SizedBox(height: 80),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(
+                          255,
+                          202,
+                          202,
+                          195,
+                        ).withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(10),
+                      child: SlideFadeIn(
+                        child: const AutoSizeText(
+                          "Escorted group tours & private trips",
+                          maxLines: 2,
+                          style: TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    SlideFadeIn(child: const FilterSection()),
+                    SizedBox(height: height * 0.4),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal:
+                      width < 700
+                          ? 8
+                          : width < 1140
+                          ? 20
+                          : 50,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TimeToDiscoverContainer(),
+                    const SizedBox(height: 20),
+                    MostPopularDestinationsContainer(),
+                    const SizedBox(height: 20),
+                    BestSellerTripsSection(),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              HowPaySection(width: width),
+              const SizedBox(height: 50),
+              FooterSection(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

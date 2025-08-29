@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+
+class CustomContactButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const CustomContactButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 18),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1F3A5F), // Dark blue color
+          foregroundColor: Colors.white, // Text color
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), // Rounded edges
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 17),
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+        ),
+        child: const Text('Contact Us'),
+      ),
+    );
+  }
+}
