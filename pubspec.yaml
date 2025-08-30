@@ -41,6 +41,11 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_avif: ^3.0.0
   smooth_scroll_multiplatform: ^1.0.8
+  awesome_dialog: ^3.2.1
+  youtube_player_flutter: ^9.1.2
+  expansion_tile_list: ^2.0.0
+  flutter_expanded_tile: ^0.4.0
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

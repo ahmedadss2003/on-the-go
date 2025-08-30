@@ -4,6 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   flutter_avif_windows
+  flutter_inappwebview_windows
+  rive_common
   url_launcher_windows
 )
 
