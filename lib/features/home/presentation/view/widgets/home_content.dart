@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:on_the_go/core/const/app_colors.dart' as AppColors;
 import 'package:on_the_go/features/home/presentation/view/widgets/best_seller_trip_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/bg_container.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/footer_section.dart';
@@ -26,14 +27,14 @@ class HomeContent extends StatelessWidget {
                 child: Column(
                   children: [
                     const OfferContainerSection(),
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 100),
                     Container(
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(
                           255,
-                          202,
-                          202,
-                          195,
+                          249,
+                          249,
+                          247,
                         ).withOpacity(0.6),
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -43,8 +44,9 @@ class HomeContent extends StatelessWidget {
                           "Escorted group tours & private trips",
                           maxLines: 2,
                           style: TextStyle(
-                            fontSize: 36,
+                            fontSize: 46,
                             fontWeight: FontWeight.w700,
+                            color: AppColors.primaryColor,
                           ),
                         ),
                       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BestSellerTourCard extends StatelessWidget {
+class BestSellerTourCard extends StatefulWidget {
   final String imageUrl;
   final String title;
   final String country;
@@ -32,24 +32,56 @@ class BestSellerTourCard extends StatelessWidget {
   });
 
   @override
+  State<BestSellerTourCard> createState() => _BestSellerTourCardState();
+}
+
+class _BestSellerTourCardState extends State<BestSellerTourCard> {
+  double spreadRadius = 2;
+  Color containerColor = Colors.white;
+  bool isHover = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 280,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            spreadRadius: 2,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_buildImageSection(), _buildContentSection()],
+    return MouseRegion(
+      onEnter: (event) {
+        setState(() {
+          spreadRadius = 4;
+          containerColor = Colors.grey[200]!;
+          isHover = true;
+        });
+      },
+      onExit: (event) {
+        setState(() {
+          spreadRadius = 2;
+          containerColor = Colors.white;
+          isHover = false;
+        });
+      },
+      child: Container(
+        width: 280,
+        decoration: BoxDecoration(
+          color: containerColor,
+          borderRadius: BorderRadius.circular(16),
+          border:
+              isHover
+                  ? Border.all(
+                    color: const Color.fromARGB(255, 0, 73, 95)!,
+                    width: 0,
+                  )
+                  : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              spreadRadius: spreadRadius,
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [_buildImageSection(), _buildContentSection()],
+        ),
       ),
     );
   }
@@ -64,7 +96,7 @@ class BestSellerTourCard extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(imageUrl),
+                image: NetworkImage(widget.imageUrl),
                 fit: BoxFit.cover,
               ),
             ),
@@ -106,7 +138,7 @@ class BestSellerTourCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'Save\n$discountPercent%',
+              'Save\n${widget.discountPercent}%',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
@@ -139,7 +171,7 @@ class BestSellerTourCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                country,
+                widget.country,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -150,7 +182,7 @@ class BestSellerTourCard extends StatelessWidget {
               const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
               const SizedBox(width: 4),
               Text(
-                '$rating',
+                '${widget.rating}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -158,14 +190,14 @@ class BestSellerTourCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                '($reviewCount)',
+                '(${widget.reviewCount})',
                 style: const TextStyle(fontSize: 12, color: Color(0xFF999999)),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            title,
+            widget.title,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -173,13 +205,13 @@ class BestSellerTourCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _buildDetailRow('$days Days', null),
+          _buildDetailRow('${widget.days} Days', null),
           const SizedBox(height: 8),
-          _buildDetailRow(location, null),
+          _buildDetailRow(widget.location, null),
           const SizedBox(height: 8),
-          _buildDetailRow('Age Range: $ageRange', null),
+          _buildDetailRow('Age Range: ${widget.ageRange}', null),
           const SizedBox(height: 8),
-          _buildDetailRow('Max Group Size: $maxGroupSize', null),
+          _buildDetailRow('Max Group Size: ${widget.maxGroupSize}', null),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -195,7 +227,7 @@ class BestSellerTourCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '\$${originalPrice.toInt()}',
+                        '\$${widget.originalPrice.toInt()}',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFFE53E3E),
@@ -226,7 +258,7 @@ class BestSellerTourCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '\$${currentPrice.toInt()}',
+                        '\$${widget.currentPrice.toInt()}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
