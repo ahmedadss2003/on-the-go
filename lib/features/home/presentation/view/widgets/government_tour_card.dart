@@ -1,22 +1,26 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
+import 'package:on_the_go/features/home/data/models/government_model.dart';
 import 'package:on_the_go/features/place_details/presentation/views/place_details_view.dart';
 
-class TourCard extends StatefulWidget {
-  const TourCard({super.key});
+class GovernmentFilterTourCard extends StatefulWidget {
+  const GovernmentFilterTourCard({super.key, required this.governmentModel});
+  final GovernmentModel governmentModel;
 
   @override
-  State<TourCard> createState() => _TourCardState();
+  State<GovernmentFilterTourCard> createState() =>
+      _GovernmentFilterTourCardState();
 }
 
-class _TourCardState extends State<TourCard> {
+class _GovernmentFilterTourCardState extends State<GovernmentFilterTourCard> {
   Color containerColor = Colors.white;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.go(PlaceDetailsView.routeName);
+        context.go(DiscoverPlacesView.routeName);
       },
       child: MouseRegion(
         onEnter: (event) {
@@ -56,11 +60,9 @@ class _TourCardState extends State<TourCard> {
                 child: Container(
                   height: 200,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(
-                        'https://images.unsplash.com/photo-1564507592333-c60657eea523?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-                      ),
+                      image: NetworkImage(widget.governmentModel.image),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -74,22 +76,22 @@ class _TourCardState extends State<TourCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title
-                    const AutoSizeText(
-                      'India tours',
+                    AutoSizeText(
+                      widget.governmentModel.name,
                       style: TextStyle(
                         fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: Color(0xFF2C3E50),
-                        letterSpacing: -0.5,
+                        letterSpacing: -0.1,
                       ),
                     ),
 
                     const SizedBox(height: 12),
 
                     // Description
-                    const AutoSizeText(
+                    AutoSizeText(
                       maxLines: 2,
-                      'First time visitors to India will want to take in the Golden Triangle of Delhi, Jaipur and Agra, home to the Taj Mahal. Return visitors can head to the lesser-visited south.',
+                      widget.governmentModel.description,
                       style: TextStyle(
                         fontSize: 16,
                         height: 1.5,
@@ -107,5 +109,3 @@ class _TourCardState extends State<TourCard> {
     );
   }
 }
-
-// Example usage in a screen

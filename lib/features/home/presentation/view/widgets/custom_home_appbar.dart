@@ -3,35 +3,56 @@ import 'package:on_the_go/features/home/presentation/view/widgets/contact_us_but
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key});
-
+  const CustomAppBar({super.key, required this.footerKey});
+  final GlobalKey footerKey;
   @override
   Size get preferredSize => const Size.fromHeight(80);
+
+  void _scrollToFooter(BuildContext context) {
+    Scrollable.ensureVisible(
+      footerKey.currentContext!,
+      alignment: 0.0,
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final double tabletMobileWidth = 1041;
     return AppBar(
       backgroundColor: Color.fromARGB(255, 22, 14, 78),
-      leading: width > 1000 ? const SizedBox() : null,
+      leading: width > 600 ? const SizedBox() : null,
       title: Row(
         children: [
           if (width > 1000) const SizedBox(width: 100),
           Image.asset("assets/images/logo.png", width: 100),
           const SizedBox(width: 30),
           if (width > tabletMobileWidth)
-            Row(
-              children: List.generate(
-                4,
-                (_) => const Padding(
-                  padding: EdgeInsets.only(right: 30, top: 15),
-                  child: HoverMenuDestinationButton(),
-                ),
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: Row(
+                children: [
+                  HoverMenuDestinationButton(),
+                  SizedBox(width: 30),
+                  HoverMenuDestinationButton(),
+                  SizedBox(width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        _scrollToFooter(context);
+                      },
+                      txt: "About Us",
+                    ),
+                  ),
+                ],
               ),
             ),
           Spacer(),
           width > tabletMobileWidth
-              ? CustomContactButton(onPressed: () {})
+              ? CustomAppBarButton(onPressed: () {}, txt: "Contact Us")
               : const SizedBox(),
         ],
       ),

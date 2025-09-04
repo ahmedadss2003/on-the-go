@@ -3,9 +3,15 @@ import 'package:on_the_go/features/home/presentation/view/widgets/custom_drawer.
 import 'package:on_the_go/features/home/presentation/view/widgets/custom_home_appbar.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/home_content.dart';
 
-class HomeViewBody extends StatelessWidget {
+class HomeViewBody extends StatefulWidget {
   const HomeViewBody({super.key});
 
+  @override
+  State<HomeViewBody> createState() => _HomeViewBodyState();
+}
+
+class _HomeViewBodyState extends State<HomeViewBody> {
+  final GlobalKey _footerKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -14,10 +20,10 @@ class HomeViewBody extends StatelessWidget {
         // backgroundColor: Colors.transparent,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(80),
-          child: CustomAppBar(),
+          child: CustomAppBar(footerKey: _footerKey),
         ),
         endDrawer: width < 800 ? const CustomDrawer() : null,
-        body: HomeContent(),
+        body: HomeContent(footerKey: _footerKey),
       ),
     );
   }

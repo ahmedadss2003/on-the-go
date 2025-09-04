@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  firebase_core
   flutter_avif_windows
   flutter_inappwebview_windows
   rive_common

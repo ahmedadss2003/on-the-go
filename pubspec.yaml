@@ -47,6 +47,7 @@ dependencies:
   flutter_expanded_tile: ^0.4.0
   intl: ^0.20.2
   sticky_headers: ^0.3.0+2
+  firebase_core: ^4.1.0
 
 dev_dependencies:
   flutter_test:

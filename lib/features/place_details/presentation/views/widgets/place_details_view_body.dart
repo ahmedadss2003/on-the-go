@@ -3,6 +3,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:intl/intl.dart';
+import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
 
 class PlaceDetailsViewBody extends StatefulWidget {
   const PlaceDetailsViewBody({super.key});
@@ -261,15 +262,13 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                   maxLines: 1,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 ),
-                // Placeholder for similar tours
-                Container(
-                  height: 200,
-                  margin: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 30,
                   ),
-                  child: const Center(child: Text('Similar Tours Section')),
+                  child: CustomDiscoverPlacesGridView(categoryName: "Cairo"),
                 ),
               ],
             ),

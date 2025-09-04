@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:on_the_go/features/place_details/presentation/views/place_details_view.dart';
 
 class BestSellerTourCard extends StatefulWidget {
   final String imageUrl;
@@ -57,30 +59,35 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
           isHover = false;
         });
       },
-      child: Container(
-        width: 280,
-        decoration: BoxDecoration(
-          color: containerColor,
-          borderRadius: BorderRadius.circular(16),
-          border:
-              isHover
-                  ? Border.all(
-                    color: const Color.fromARGB(255, 0, 73, 95)!,
-                    width: 0,
-                  )
-                  : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
-              spreadRadius: spreadRadius,
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildImageSection(), _buildContentSection()],
+      child: GestureDetector(
+        onTap: () {
+          context.go(PlaceDetailsView.routeName);
+        },
+        child: Container(
+          width: 280,
+          decoration: BoxDecoration(
+            color: containerColor,
+            borderRadius: BorderRadius.circular(16),
+            border:
+                isHover
+                    ? Border.all(
+                      color: const Color.fromARGB(255, 0, 73, 95)!,
+                      width: 0,
+                    )
+                    : null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.15),
+                spreadRadius: spreadRadius,
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_buildImageSection(), _buildContentSection()],
+          ),
         ),
       ),
     );

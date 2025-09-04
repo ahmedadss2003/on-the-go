@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
-class CustomContactButton extends StatelessWidget {
+class CustomAppBarButton extends StatelessWidget {
   final VoidCallback onPressed;
+  final String txt;
 
-  const CustomContactButton({super.key, required this.onPressed});
+  const CustomAppBarButton({
+    super.key,
+    required this.onPressed,
+    required this.txt,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class CustomContactButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 17),
           textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
         ),
-        child: const Text('Contact Us'),
+        child: Text(txt),
       ),
     );
   }

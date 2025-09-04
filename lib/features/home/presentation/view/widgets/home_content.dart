@@ -12,7 +12,8 @@ import 'package:on_the_go/features/home/presentation/view/widgets/tour_filter.da
 import 'offer_container_section.dart';
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
+  final GlobalKey footerKey;
+  const HomeContent({super.key, required this.footerKey});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +82,7 @@ class HomeContent extends StatelessWidget {
               const SizedBox(height: 20),
               HowPaySection(width: width),
               const SizedBox(height: 50),
-              FooterSection(),
+              FooterSection(key: footerKey),
             ],
           ),
         );
