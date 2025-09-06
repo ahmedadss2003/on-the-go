@@ -12,19 +12,17 @@ class HomeViewBody extends StatefulWidget {
 
 class _HomeViewBodyState extends State<HomeViewBody> {
   final GlobalKey _footerKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Scaffold(
-        // backgroundColor: Colors.transparent,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
-          child: CustomAppBar(footerKey: _footerKey),
-        ),
-        endDrawer: width < 800 ? const CustomDrawer() : null,
-        body: HomeContent(footerKey: _footerKey),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: CustomAppBar(footerKey: _footerKey),
       ),
+      endDrawer: width < 800 ? const CustomDrawer() : null,
+      body: HomeContent(footerKey: _footerKey),
     );
   }
 }

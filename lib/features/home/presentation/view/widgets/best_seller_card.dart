@@ -1,37 +1,13 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_the_go/features/place_details/presentation/views/place_details_view.dart';
+import 'package:on_the_go/core/models/tour_model.dart'; // Add this import
 
 class BestSellerTourCard extends StatefulWidget {
-  final String imageUrl;
-  final String title;
-  final String country;
-  final double rating;
-  final int reviewCount;
-  final int days;
-  final String location;
-  final String ageRange;
-  final int maxGroupSize;
-  final double originalPrice;
-  final double currentPrice;
-  final int discountPercent;
+  final TourModel tour;
 
-  const BestSellerTourCard({
-    super.key,
-    this.imageUrl =
-        'https://images.unsplash.com/photo-1664624897176-4118caa15b2e?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    this.title = 'Totally Morocco',
-    this.country = 'Morocco',
-    this.rating = 4.7,
-    this.reviewCount = 164,
-    this.days = 9,
-    this.location = 'Marrakech back to Marrakech',
-    this.ageRange = '15+',
-    this.maxGroupSize = 24,
-    this.originalPrice = 1403,
-    this.currentPrice = 966,
-    this.discountPercent = 35,
-  });
+  const BestSellerTourCard({super.key, required this.tour});
 
   @override
   State<BestSellerTourCard> createState() => _BestSellerTourCardState();
@@ -61,7 +37,7 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
       },
       child: GestureDetector(
         onTap: () {
-          context.go(PlaceDetailsView.routeName);
+          context.go(PlaceDetailsView.routeName, extra: widget.tour);
         },
         child: Container(
           width: 280,
@@ -71,8 +47,8 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
             border:
                 isHover
                     ? Border.all(
-                      color: const Color.fromARGB(255, 0, 73, 95)!,
-                      width: 0,
+                      color: const Color.fromARGB(255, 0, 73, 95),
+                      width: 1,
                     )
                     : null,
             boxShadow: [
@@ -94,6 +70,11 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
   }
 
   Widget _buildImageSection() {
+    final imageUrl =
+        widget.tour.images.isNotEmpty
+            ? widget.tour.images.first.url
+            : 'https://images.unsplash.com/photo-1664624897176-4118caa15b2e?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+
     return Stack(
       children: [
         ClipRRect(
@@ -103,64 +84,73 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
             width: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(widget.imageUrl),
+                image: NetworkImage(imageUrl),
                 fit: BoxFit.cover,
               ),
             ),
           ),
         ),
-        Positioned(
-          top: 12,
-          left: 12,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFA726),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.star, color: Colors.white, size: 16),
-                const SizedBox(width: 4),
-                const Text(
-                  'Best Seller',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+        // Show Best Seller badge only if tour is marked as best seller
+        if (widget.tour.isBestSeller)
+          Positioned(
+            top: 12,
+            left: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFA726),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.star, color: Colors.white, size: 16),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Best Seller',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          top: 12,
-          right: 12,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE53E3E),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Save\n${widget.discountPercent}%',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
+                ],
               ),
             ),
           ),
-        ),
+        // Show discount badge if there's a discount
+        if (widget.tour.discount > 0)
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE53E3E),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'Save\n${widget.tour.discount.toInt()}%',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
 
   Widget _buildContentSection() {
+    // Calculate discounted price
+    final originalPrice = widget.tour.priceAdult;
+    final discountedPrice =
+        originalPrice - (originalPrice * widget.tour.discount / 100);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -178,7 +168,7 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
               ),
               const SizedBox(width: 8),
               Text(
-                widget.country,
+                widget.tour.governorate,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -187,85 +177,97 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
               ),
               const Spacer(),
               const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
+              const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
+              const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
+              const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
+              const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
               const SizedBox(width: 4),
               Text(
-                '${widget.rating}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                widget.tour.rating.toString() ??
+                    "4.5", // You might want to add rating to TourModel
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(width: 4),
               Text(
-                '(${widget.reviewCount})',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF999999)),
+                widget.tour.review.toString() ??
+                    "20", // You might want to add review count to TourModel
+                style: TextStyle(fontSize: 12, color: Color(0xFF999999)),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            widget.title,
+          AutoSizeText(
+            widget.tour.title,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1A365D),
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
-          _buildDetailRow('${widget.days} Days', null),
+          AutoSizeText(
+            minFontSize: 12,
+            widget.tour.description,
+            maxFontSize: 20,
+            style: const TextStyle(
+              // fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1A365D),
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 12),
+          _buildDetailRow(widget.tour.timeOfTour, null),
           const SizedBox(height: 8),
-          _buildDetailRow(widget.location, null),
+          _buildDetailRow(widget.tour.governorate, null),
           const SizedBox(height: 8),
-          _buildDetailRow('Age Range: ${widget.ageRange}', null),
+          _buildDetailRow('Age: ${widget.tour.ageRequirement}', null),
           const SizedBox(height: 8),
-          _buildDetailRow('Max Group Size: ${widget.maxGroupSize}', null),
-          const SizedBox(height: 16),
+
           Row(
             children: [
+              // Show original price only if there's a discount
+              if (widget.tour.discount > 0) ...[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '\$${originalPrice.toInt()}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFFE53E3E),
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        const Text(
+                          'pp',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFE53E3E),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+              ],
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'From',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF666666)),
-                  ),
                   const SizedBox(height: 4),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '\$${widget.originalPrice.toInt()}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFFE53E3E),
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                      const Text(
-                        'pp',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFFE53E3E),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'USD',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '\$${widget.currentPrice.toInt()}',
+                        '\$${widget.tour.discount > 0 ? discountedPrice.toInt() : originalPrice.toInt()}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -301,6 +303,8 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
           child: Text(
             text,
             style: const TextStyle(fontSize: 14, color: Color(0xFF666666)),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

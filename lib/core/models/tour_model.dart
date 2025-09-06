@@ -1,159 +1,124 @@
-import 'package:on_the_go/core/models/category_model.dart';
-import 'package:on_the_go/core/models/service_item.dart';
+import 'package:flutter/material.dart';
+import 'package:on_the_go/core/entities/tour_entity.dart';
 import 'package:on_the_go/core/models/tour_images_model.dart';
 
-class TourModel {
-  final int id;
-  final String title;
-  final String description;
-  final String? status;
-  final String? timeOfTour;
-  final int? ageRequirement;
-  final String availability;
-  final int numberOfPeople;
-  final String? departureTime;
-  final String? returnTime;
-  final int priceAdult;
-  final int priceChild;
-  final int discount;
-  final String createdAt;
-  final String updatedAt;
-  final String? youtubeVideoUrl;
-  final List<ServiceItem> includes;
-  final List<ServiceItem> notIncludes;
-  final List<CategoryModel> categories;
-  final List<TourImage> images;
-
+class TourModel extends Tour {
   TourModel({
-    required this.id,
-    required this.title,
-    required this.description,
-    this.status,
-    this.timeOfTour,
-    this.ageRequirement,
-    required this.availability,
-    required this.numberOfPeople,
-    required this.departureTime,
-    required this.returnTime,
-    required this.priceAdult,
-    required this.priceChild,
-    required this.discount,
-    required this.createdAt,
-    required this.updatedAt,
-    this.youtubeVideoUrl, // Added to constructor
-    required this.includes,
-    required this.notIncludes,
-    required this.categories,
-    required this.images,
+    required super.id,
+    required super.title,
+    required super.description,
+    required super.timeOfTour,
+    required super.ageRequirement,
+    required super.availability,
+    required super.numberOfPeople,
+    required super.youtubeVideoUrl,
+    super.departureTime,
+    super.returnTime,
+    required super.priceAdult,
+    required super.priceChild,
+    required super.discount,
+    required super.priceIncludes,
+    required super.priceExcludes,
+    required super.images,
+    required super.status,
+    required super.isBestSeller,
+    required super.governorate,
+    required super.category,
+    required super.review,
+    required super.rating,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'timeOfTour': timeOfTour,
+      'ageRequirement': ageRequirement,
+      'availability': availability,
+      'numberOfPeople': numberOfPeople,
+      'youtubeVideoUrl': youtubeVideoUrl,
+      'departureTime':
+          departureTime != null ? formatTimeOfDay(departureTime!) : null,
+      'returnTime': returnTime != null ? formatTimeOfDay(returnTime!) : null,
+      'priceAdult': priceAdult,
+      'priceChild': priceChild,
+      'discount': discount,
+      'priceIncludes': priceIncludes,
+      'priceExcludes': priceExcludes,
+      'images': images.map((e) => e.toJson()).toList(),
+      'status': status,
+      "governorate": governorate,
+      'isBestSeller': isBestSeller,
+      'category': category,
+      'review': review,
+      'rating': rating,
+    };
+  }
 
   factory TourModel.fromJson(Map<String, dynamic> json) {
     return TourModel(
-      id: json['id'] ?? 0,
+      id: json['id'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      status: json['status'],
-      timeOfTour: json['time_of_tour'],
-      ageRequirement: json['age_requirement'],
+      timeOfTour: json['timeOfTour'] ?? '',
+      ageRequirement: json['ageRequirement'] ?? '',
       availability: json['availability'] ?? '',
-      numberOfPeople: json['number_of_people'] ?? 0,
-      departureTime: json['departure_time'],
-      returnTime: json['return_time'],
-      priceAdult: json['price_adult'] ?? 0,
-      priceChild: json['price_child'] ?? 0,
-      discount: json['discount'] ?? 0,
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-      youtubeVideoUrl: json['youtube_video_url'],
-      includes:
-          (json['includes'] as List<dynamic>?)
-              ?.map((x) => ServiceItem.fromJson(x))
-              .toList() ??
-          [],
-      notIncludes:
-          (json['not_includes'] as List<dynamic>?)
-              ?.map((x) => ServiceItem.fromJson(x))
-              .toList() ??
-          [],
-      categories:
-          (json['categories'] as List<dynamic>?)
-              ?.map((x) => CategoryModel.fromJson(x))
-              .toList() ??
-          [],
+      numberOfPeople: json['numberOfPeople'] ?? '',
+      youtubeVideoUrl: json['youtubeVideoUrl'] ?? '',
+      departureTime:
+          json['departureTime'] != null
+              ? TourModel.parseTimeOfDay(json['departureTime'])
+              : null,
+      returnTime:
+          json['returnTime'] != null
+              ? TourModel.parseTimeOfDay(json['returnTime'])
+              : null,
+      priceAdult: _convertToDouble(json['priceAdult']),
+      priceChild: _convertToDouble(json['priceChild']),
+      discount: _convertToDouble(json['discount']),
+      priceIncludes: json['priceIncludes'] ?? '',
+      priceExcludes: json['priceExcludes'] ?? '',
       images:
-          (json['images'] as List<dynamic>?)
-              ?.map((x) => TourImage.fromJson(x))
-              .toList() ??
-          [],
+          (json['images'] as List<dynamic>? ?? [])
+              .map((e) => TourImage.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      status: json['status'] ?? 'Popular',
+      isBestSeller: json['isBestSeller'] ?? false,
+      governorate: json['governorate'] ?? 'Sharm El Sheikh',
+      category: json['category'] ?? 'Red Sea',
+      review: json['review'] ?? "",
+      rating: json['rating'] ?? "0",
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'title': title,
-    'description': description,
-    'status': status,
-    'time_of_tour': timeOfTour,
-    'age_requirement': ageRequirement,
-    'availability': availability,
-    'number_of_people': numberOfPeople,
-    'departure_time': departureTime,
-    'return_time': returnTime,
-    'price_adult': priceAdult,
-    'price_child': priceChild,
-    'discount': discount,
-    'created_at': createdAt,
-    'updated_at': updatedAt,
-    'youtube_video_url': youtubeVideoUrl, // Added to JSON serialization
-    'includes': includes.map((x) => x.toJson()).toList(),
-    'not_includes': notIncludes.map((x) => x.toJson()).toList(),
-    'categories': categories.map((x) => x.toJson()).toList(),
-    'images': images.map((x) => x.toJson()).toList(),
-  };
+  // Helper method to safely convert to double
+  static double _convertToDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  static TimeOfDay? parseTimeOfDay(String timeString) {
+    try {
+      if (timeString.isEmpty) return null;
+      final parts = timeString.split(':');
+      if (parts.length == 2) {
+        final hour = int.parse(parts[0]);
+        final minute = int.parse(parts[1]);
+        return TimeOfDay(hour: hour, minute: minute);
+      }
+    } catch (e) {
+      print('Error parsing time: $e');
+    }
+    return null;
+  }
 }
 
-
-  // factory TourModel.fromJson(Map<String, dynamic> json) {
-  //   return TourModel(
-  //     id: json['id'],
-  //     title: json['title'],
-  //     description: json['description'],
-  //     status: json['status'],
-  //     timeOfTour: json['time_of_tour'],
-  //     ageRequirement: json['age_requirement'],
-  //     availability: json['availability'],
-  //     numberOfPeople: json['number_of_people'],
-  //     departureTime: json['departure_time'],
-  //     returnTime: json['return_time'],
-  //     priceAdult: json['price_adult'],
-  //     priceChild: json['price_child'],
-  //     discount: json['discount'],
-  //     createdAt: json['created_at'],
-  //     updatedAt: json['updated_at'],
-  //     youtubeVideoUrl: json['youtube_video_url'], // Added JSON parsing
-  //     includes:
-  //         json['includes'] != null
-  //             ? List<ServiceItem>.from(
-  //               json['includes'].map((x) => ServiceItem.fromJson(x)),
-  //             )
-  //             : [],
-  //     notIncludes:
-  //         json['not_includes'] != null
-  //             ? List<ServiceItem>.from(
-  //               json['not_includes'].map((x) => ServiceItem.fromJson(x)),
-  //             )
-  //             : [],
-  //     categories:
-  //         json['categories'] != null
-  //             ? List<CategoryModel>.from(
-  //               json['categories'].map((x) => CategoryModel.fromJson(x)),
-  //             )
-  //             : [],
-  //     images:
-  //         json['images'] != null
-  //             ? List<TourImage>.from(
-  //               json['images'].map((x) => TourImage.fromJson(x)),
-  //             )
-  //             : [],
-  //   );
-  // }
+String formatTimeOfDay(TimeOfDay time) {
+  final hour = time.hour.toString().padLeft(2, '0');
+  final minute = time.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}

@@ -7,6 +7,7 @@ class HowPaySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 247, 236, 236),
       ),
@@ -25,12 +26,11 @@ class HowPaySection extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: width < 700 ? 25 : 60),
               child: AutoSizeText(
-                maxLines: 3,
-
+                // maxLines: 3,
                 textAlign: TextAlign.center,
-                "You don’t have to pay until you are here in Sharm El Sheikh , we will send you our representative to Meet You at your hotel to give you the Full details for the excursions and collect the money before your excursions Cash or by Credit Card with add 5% on Total Payment.Or you can visit us at our office",
+                "We give you 3 options for payment then you can choose the best for you : \n1-	Book now and pay full amount by card to save your time and money while you are in your holiday in Sharm.\n2-	Book now and pay only 25% deposit by card and pay the balance in cash while you are in Sharm before your trips.\n 3-	Book now and pay the full amount in cash while you are in Sharm before your trips.",
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: Color(0xff1a73e8),
                 ),

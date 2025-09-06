@@ -1,33 +1,14 @@
 class TourImage {
-  final int id;
-  final int tourId;
-  final String image;
-  final String createdAt;
-  final String updatedAt;
+  final String url;
+  final String publicId;
 
-  TourImage({
-    required this.id,
-    required this.tourId,
-    required this.image,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+  TourImage({required this.url, required this.publicId});
 
   factory TourImage.fromJson(Map<String, dynamic> json) {
-    return TourImage(
-      id: json['id'],
-      tourId: json['tour_id'],
-      image: json['image'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-    );
+    return TourImage(url: json['url'], publicId: json['public_id']);
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'tour_id': tourId,
-        'image': image,
-        'created_at': createdAt,
-        'updated_at': updatedAt,
-      };
+  Map<String, dynamic> toJson() {
+    return {'url': url, 'public_id': publicId};
+  }
 }

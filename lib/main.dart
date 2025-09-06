@@ -2,12 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:on_the_go/core/app_router/app_router.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:on_the_go/core/services/service_locator.dart';
 import 'firebase_options.dart';
-void main() async{
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await setupServiceLocator();
   setUrlStrategy(PathUrlStrategy());
   runApp(const MyApp());
 }

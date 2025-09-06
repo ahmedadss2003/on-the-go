@@ -3,41 +3,18 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:intl/intl.dart';
+import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
 
 class PlaceDetailsViewBody extends StatefulWidget {
-  const PlaceDetailsViewBody({super.key});
-
+  const PlaceDetailsViewBody({super.key, required this.tourModel});
+  final TourModel tourModel;
   @override
   PlaceDetailsViewBodyState createState() => PlaceDetailsViewBodyState();
 }
 
 class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     with SingleTickerProviderStateMixin {
-  // Demo data
-  static const Map<String, dynamic> _demoPlace = {
-    'title': 'Santorini Island Adventure',
-    'description':
-        'Experience the breathtaking beauty of Santorini with its iconic white-washed buildings, stunning sunsets, and crystal-clear waters. This full-day tour includes visits to Oia village, Fira town, and traditional wineries.',
-    'images': [
-      'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800',
-      'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800',
-      'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800',
-    ],
-    'priceAdult': 120,
-    'priceChild': 60,
-    'discount': 20,
-    'timeOfTour': '8 Hours',
-    'numberOfPeople': 15,
-    'ageRequirement': 12,
-    'availability': 'All Year',
-    'departureTime': '08:00:00',
-    'returnTime': '18:00:00',
-    'youtubeVideoUrl': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    'includes': ['Professional Guide', 'Transportation', 'Lunch', 'Entry Fees'],
-    'notIncludes': ['Personal Expenses', 'Tips', 'Travel Insurance', 'Drinks'],
-  };
-
   final _formKey = GlobalKey<FormState>();
   final _controllers = {
     'name': TextEditingController(),
@@ -118,7 +95,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   void _showImageGallery() {
     int currentPage = 0;
     final pageController = PageController();
-    final images = _demoPlace['images'] as List<String>;
+    final images = widget.tourModel.images.map((e) => e.url).toList();
 
     showDialog(
       context: context,
@@ -160,7 +137,6 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                                               ),
                                     ),
                               ),
-                              // Navigation arrows
                               if (currentPage > 0)
                                 Positioned(
                                   left: 10,
@@ -214,7 +190,6 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                             ],
                           ),
                         ),
-                        // Page indicators
                         Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
@@ -262,13 +237,14 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                   maxLines: 1,
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 30,
                   ),
-                  child: CustomDiscoverPlacesGridView(categoryName: "Cairo"),
+                  child: CustomDiscoverPlacesGridView(
+                    categoryName: widget.tourModel.category,
+                  ),
                 ),
               ],
             ),
@@ -293,7 +269,11 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(_demoPlace['images'][0]),
+                  image: NetworkImage(
+                    widget.tourModel.images.isNotEmpty
+                        ? widget.tourModel.images[0].url
+                        : '',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -317,14 +297,18 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildHeroStat("4.5", 'Rating', Icons.star),
                   _buildHeroStat(
-                    _demoPlace['timeOfTour'],
+                    widget.tourModel.rating.toString(),
+                    'Rating',
+                    Icons.star,
+                  ),
+                  _buildHeroStat(
+                    widget.tourModel.timeOfTour,
                     'Duration',
                     Icons.access_time,
                   ),
                   _buildHeroStat(
-                    _demoPlace['numberOfPeople'].toString(),
+                    widget.tourModel.numberOfPeople,
                     'Max Group',
                     Icons.group,
                   ),
@@ -429,7 +413,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _demoPlace['title'],
+          widget.tourModel.title,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -451,22 +435,22 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             children: [
               _buildStatItem(
                 Icons.access_time,
-                _demoPlace['timeOfTour'],
+                widget.tourModel.timeOfTour,
                 'Duration',
               ),
               _buildStatItem(
                 Icons.groups,
-                '${_demoPlace['ageRequirement']}+',
+                '${widget.tourModel.ageRequirement}+',
                 'Min Age',
               ),
               _buildStatItem(
                 Icons.calendar_month,
-                _demoPlace['availability'],
+                widget.tourModel.availability,
                 'Available',
               ),
               _buildStatItem(
                 Icons.people,
-                _demoPlace['numberOfPeople'].toString(),
+                widget.tourModel.numberOfPeople,
                 'Group Size',
               ),
             ],
@@ -519,7 +503,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
           ),
         ),
         content: Text(
-          _demoPlace['description'],
+          widget.tourModel.description,
           style: TextStyle(fontSize: 18, height: 1.5, color: Colors.grey[800]),
         ),
         controller: ExpandedTileController(),
@@ -544,13 +528,17 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
         children: [
           _buildInfoRow(
             'Departure Time',
-            'Around ${_formatTime(_demoPlace['departureTime'])}',
+            widget.tourModel.departureTime != null
+                ? 'Around ${formatTimeOfDay(widget.tourModel.departureTime!)}'
+                : 'N/A',
             Icons.schedule,
           ),
           const SizedBox(height: 15),
           _buildInfoRow(
             'Return Time',
-            'Around ${_formatTime(_demoPlace['returnTime'])}',
+            widget.tourModel.returnTime != null
+                ? 'Around ${formatTimeOfDay(widget.tourModel.returnTime!)}'
+                : 'N/A',
             Icons.schedule_send,
           ),
         ],
@@ -599,8 +587,16 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
-        final includeList = _demoPlace['includes'] as List<String>;
-        final notIncludeList = _demoPlace['notIncludes'] as List<String>;
+        final includeList =
+            widget.tourModel.priceIncludes
+                .split(',')
+                .map((e) => e.trim())
+                .toList();
+        final notIncludeList =
+            widget.tourModel.priceExcludes
+                .split(',')
+                .map((e) => e.trim())
+                .toList();
 
         return isMobile
             ? Column(
@@ -703,9 +699,9 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   }
 
   Widget _buildBookingForm() {
-    final price = (_demoPlace['priceAdult'] - _demoPlace['discount']) as int;
+    final price = (widget.tourModel.priceAdult - widget.tourModel.discount);
     final totalPrice =
-        (adults * price + children * _demoPlace['priceChild']).toString();
+        (adults * price + children * widget.tourModel.priceChild).toString();
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
@@ -729,7 +725,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             Row(
               children: [
                 Text(
-                  '£$price ',
+                  '£${price.toStringAsFixed(2)}',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -1001,7 +997,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                 style: TextStyle(color: Colors.white70, fontSize: 12),
               ),
               Text(
-                '£ $totalPrice',
+                '£$totalPrice',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
