@@ -10,6 +10,7 @@ class BestSellerTripsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    context.read<TourCubitCubit>().getBestSellerTours();
 
     return BlocBuilder<TourCubitCubit, TourCubitState>(
       builder: (context, state) {

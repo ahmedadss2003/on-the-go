@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
 
-// Main Filter Section Widget
-class FilterSection extends StatelessWidget {
+class FilterSection extends StatefulWidget {
   const FilterSection({super.key});
+
+  @override
+  _FilterSectionState createState() => _FilterSectionState();
+}
+
+class _FilterSectionState extends State<FilterSection> {
+  String? selectedGovernment;
+  String? selectedType;
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +21,7 @@ class FilterSection extends StatelessWidget {
         final isTablet = constraints.maxWidth < 1000;
         double width = MediaQuery.of(context).size.width;
         return Container(
+          height: 90,
           width:
               isMobile
                   ? width
@@ -20,9 +30,16 @@ class FilterSection extends StatelessWidget {
                   : width * 0.5,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.circular(33),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
         );
       },
@@ -33,11 +50,29 @@ class FilterSection extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Expanded(child: WhereToButton()),
+        Expanded(
+          child: WhereToButton(
+            selectedGovernment: selectedGovernment,
+            onGovernmentSelected: (government) {
+              setState(() {
+                selectedGovernment = government;
+              });
+            },
+          ),
+        ),
         const SizedBox(width: 8),
-        const Expanded(child: TypeButton()),
+        Expanded(
+          child: TypeButton(
+            selectedType: selectedType,
+            onTypeSelected: (type) {
+              setState(() {
+                selectedType = type;
+              });
+            },
+          ),
+        ),
         const SizedBox(width: 8),
-        const SearchButton(),
+        SearchButton(governmentName: selectedGovernment, type: selectedType),
       ],
     );
   }
@@ -46,60 +81,373 @@ class FilterSection extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Expanded(flex: 1, child: WhereToButton()),
+        Expanded(
+          flex: 1,
+          child: WhereToButton(
+            selectedGovernment: selectedGovernment,
+            onGovernmentSelected: (government) {
+              setState(() {
+                selectedGovernment = government;
+              });
+            },
+          ),
+        ),
         const SizedBox(width: 8),
-        const Expanded(flex: 1, child: TypeButton()),
+        Expanded(
+          flex: 1,
+          child: TypeButton(
+            selectedType: selectedType,
+            onTypeSelected: (type) {
+              setState(() {
+                selectedType = type;
+              });
+            },
+          ),
+        ),
         const SizedBox(width: 16),
-        const SearchButton(),
+        SearchButton(governmentName: selectedGovernment, type: selectedType),
       ],
     );
   }
 }
 
-// Where To Button Widget
-class WhereToButton extends StatelessWidget {
-  const WhereToButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return FilterButton(
-      icon: Icons.location_on_rounded,
-      label: 'Where to?',
-      hint: 'Explore destinations',
-    );
-  }
-}
-
-// Type Button Widget
 class TypeButton extends StatelessWidget {
-  const TypeButton({super.key});
+  final String? selectedType;
+  final Function(String) onTypeSelected;
+
+  const TypeButton({
+    super.key,
+    required this.onTypeSelected,
+    this.selectedType,
+  });
 
   @override
   Widget build(BuildContext context) {
     return FilterButton(
       icon: Icons.category_rounded,
       label: 'Type',
-      hint: 'Select type',
-      onTap: () {},
+      hint: selectedType ?? 'Select type',
+      onTap: () {
+        _showTypeMenu(context);
+      },
+    );
+  }
+
+  void _showTypeMenu(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    final types = [
+      {'name': 'Red Sea Tours', 'icon': Icons.water_rounded},
+      {'name': 'Historical Tours', 'icon': Icons.history_edu_rounded},
+      {'name': 'Family & fun Tours', 'icon': Icons.family_restroom_rounded},
+      {'name': 'Sharm Desert Tours', 'icon': Icons.terrain_rounded},
+    ];
+
+    if (isMobile) {
+      showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        backgroundColor: Colors.white,
+        isScrollControlled: true,
+        builder:
+            (context) => _CustomMenu(
+              items: types,
+              selectedItem: selectedType,
+              onItemSelected: onTypeSelected,
+              title: 'Select Tour Type',
+            ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (context) => Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backgroundColor: Colors.white,
+              child: _CustomMenu(
+                items: types,
+                selectedItem: selectedType,
+                onItemSelected: onTypeSelected,
+                title: 'Select Tour Type',
+              ),
+            ),
+      );
+    }
+  }
+}
+
+class WhereToButton extends StatelessWidget {
+  final String? selectedGovernment;
+  final Function(String) onGovernmentSelected;
+
+  const WhereToButton({
+    super.key,
+    required this.onGovernmentSelected,
+    this.selectedGovernment,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterButton(
+      icon: Icons.location_on_rounded,
+      label: 'Where to?',
+      hint: selectedGovernment ?? 'Explore destinations',
+      onTap: () {
+        _showGovernmentMenu(context);
+      },
+    );
+  }
+
+  void _showGovernmentMenu(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    final governments = [
+      {'name': 'Sharm El Sheikh Tours', 'icon': Icons.beach_access_rounded},
+      {'name': 'Cairo Tours', 'icon': Icons.account_balance_rounded},
+      {'name': 'Luxor Tours', 'icon': Icons.apartment_rounded},
+    ];
+
+    if (isMobile) {
+      showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        backgroundColor: Colors.white,
+        isScrollControlled: true,
+        builder:
+            (context) => _CustomMenu(
+              items: governments,
+              selectedItem: selectedGovernment,
+              onItemSelected: onGovernmentSelected,
+              title: 'Select Destination',
+            ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (context) => Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backgroundColor: Colors.white,
+              child: _CustomMenu(
+                items: governments,
+                selectedItem: selectedGovernment,
+                onItemSelected: onGovernmentSelected,
+                title: 'Select Destination',
+              ),
+            ),
+      );
+    }
+  }
+}
+
+class _CustomMenu extends StatefulWidget {
+  final List<Map<String, dynamic>> items;
+  final String? selectedItem;
+  final Function(String) onItemSelected;
+  final String title;
+
+  const _CustomMenu({
+    required this.items,
+    required this.selectedItem,
+    required this.onItemSelected,
+    required this.title,
+  });
+
+  @override
+  _CustomMenuState createState() => _CustomMenuState();
+}
+
+class _CustomMenuState extends State<_CustomMenu>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: isMobile ? MediaQuery.of(context).size.height * 0.5 : 300,
+        maxWidth: isMobile ? double.infinity : 400,
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            widget.title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.blue,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Flexible(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: widget.items.length,
+                  separatorBuilder:
+                      (context, index) =>
+                          Divider(color: Colors.grey[200], height: 1),
+                  itemBuilder: (context, index) {
+                    final item = widget.items[index];
+                    return _MenuItem(
+                      name: item['name'],
+                      icon: item['icon'],
+                      isSelected: item['name'] == widget.selectedItem,
+                      onTap: () {
+                        widget.onItemSelected(item['name']);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// Search Button Widget
+class _MenuItem extends StatefulWidget {
+  final String name;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _MenuItem({
+    required this.name,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  _MenuItemState createState() => _MenuItemState();
+}
+
+class _MenuItemState extends State<_MenuItem> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            color:
+                _isHovered || widget.isSelected
+                    ? Colors.orange.withOpacity(0.1)
+                    : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                widget.icon,
+                size: 20,
+                color: widget.isSelected ? Colors.orange : Colors.blue.shade600,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  widget.name,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: widget.isSelected ? Colors.orange : Colors.black87,
+                  ),
+                ),
+              ),
+              if (widget.isSelected)
+                const Icon(Icons.check_circle, size: 20, color: Colors.orange),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SearchButton extends StatelessWidget {
-  const SearchButton({super.key});
+  final String? governmentName;
+  final String? type;
+
+  const SearchButton({super.key, this.governmentName, this.type});
 
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        if (governmentName == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please select a destination')),
+          );
+          return;
+        }
+        context.go(
+          DiscoverPlacesView.routeName,
+          extra: {'governmentName': governmentName, 'type': type},
+        );
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange,
-        elevation: 8,
+        elevation: 6,
         shadowColor: Colors.orange.withOpacity(0.4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        padding: EdgeInsets.all(isMobile ? 8 : 12),
+        padding: EdgeInsets.all(isMobile ? 10 : 14),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -111,14 +459,12 @@ class SearchButton extends StatelessWidget {
           ),
           if (!isMobile) ...[
             const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: const Text(
-                'Search',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+            const Text(
+              'Search',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -156,12 +502,12 @@ class _FilterButtonState extends State<FilterButton>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.05,
+      end: 1.03,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
@@ -190,60 +536,84 @@ class _FilterButtonState extends State<FilterButton>
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 300),
             decoration: BoxDecoration(
-              gradient:
-                  _isHovered
-                      ? LinearGradient(
-                        colors: [
-                          Colors.orange.withOpacity(0.1),
-                          Colors.orange.withOpacity(0.2),
-                        ],
-                      )
-                      : LinearGradient(
-                        colors: [Colors.white, Colors.grey[50]!],
-                      ),
-              borderRadius: BorderRadius.circular(50),
+              gradient: LinearGradient(
+                colors:
+                    _isHovered
+                        ? [
+                          Colors.orange.withOpacity(0.15),
+                          Colors.orange.withOpacity(0.3),
+                        ]
+                        : [Colors.white, Colors.grey[100]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: _isHovered ? Colors.orange : Colors.grey[300]!,
+                color: _isHovered ? Colors.orange.shade300 : Colors.grey[300]!,
                 width: 1.5,
               ),
               boxShadow:
                   _isHovered
                       ? [
                         BoxShadow(
-                          color: Colors.orange.withOpacity(0.3),
-                          blurRadius: 8,
+                          color: Colors.orange.withOpacity(0.25),
+                          blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ]
-                      : [],
+                      : [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
             ),
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-            child: Column(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 8 : 12,
+              vertical: isMobile ? 8 : 10,
+            ),
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   widget.icon,
-                  color: _isHovered ? Colors.orange : Colors.blue,
-                  size: isMobile ? 18 : 22,
+                  color:
+                      _isHovered
+                          ? Colors.orange.shade700
+                          : Colors.blue.shade600,
+                  size: isMobile ? 20 : 24,
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  widget.label,
-                  style: TextStyle(
-                    color: _isHovered ? Colors.orange : Colors.blue,
-                    fontSize: isMobile ? 12 : 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.hint,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: isMobile ? 10 : 12,
-                  ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.label,
+                      style: TextStyle(
+                        color:
+                            _isHovered
+                                ? Colors.orange.shade700
+                                : Colors.blue.shade600,
+                        fontSize: isMobile ? 12 : 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.hint,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: isMobile ? 10 : 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ],
                 ),
               ],
             ),

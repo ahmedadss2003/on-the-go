@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
 import 'package:on_the_go/features/home/data/models/government_model.dart';
-import 'package:on_the_go/features/place_details/presentation/views/place_details_view.dart';
 
 class GovernmentFilterTourCard extends StatefulWidget {
   const GovernmentFilterTourCard({super.key, required this.governmentModel});
@@ -20,7 +19,10 @@ class _GovernmentFilterTourCardState extends State<GovernmentFilterTourCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.go(DiscoverPlacesView.routeName);
+        context.go(
+          DiscoverPlacesView.routeName,
+          extra: {"governmentName": widget.governmentModel.name},
+        );
       },
       child: MouseRegion(
         onEnter: (event) {

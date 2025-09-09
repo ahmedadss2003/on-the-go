@@ -6,15 +6,12 @@ class TimeToDiscoverContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
     return Container(
-      // width: width < 700 ? width * 0.98 : width * 0.9,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,7 +33,6 @@ class TimeToDiscoverContainer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-
           AutoSizeText(
             "Discover the world your way – on a group tour, private adventure, safari, or sailing trip. From ancient wonders to wild landscapes and sun-soaked coasts, local guides help you uncover authentic experiences in over +70 destinations.",
             style: TextStyle(color: Colors.black, fontSize: 14),

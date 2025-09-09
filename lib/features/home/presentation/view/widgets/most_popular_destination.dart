@@ -5,7 +5,6 @@ import 'package:on_the_go/features/home/presentation/view/widgets/government_tou
 
 class MostPopularDestinationsContainer extends StatelessWidget {
   const MostPopularDestinationsContainer({super.key});
-
   @override
   Widget build(BuildContext context) {
     List<GovernmentModel> governmentList = [

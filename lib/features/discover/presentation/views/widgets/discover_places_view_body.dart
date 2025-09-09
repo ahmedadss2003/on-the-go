@@ -1,10 +1,16 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/footer_section.dart';
 
 class DiscoverPlacesViewBody extends StatefulWidget {
-  const DiscoverPlacesViewBody({super.key, required this.categoryName});
-  final String categoryName;
+  const DiscoverPlacesViewBody({
+    super.key,
+    required this.governMentName,
+    this.type,
+  });
+  final String governMentName;
+  final String? type;
 
   @override
   State<DiscoverPlacesViewBody> createState() => _DiscoverPlacesViewBodyState();
@@ -58,7 +64,7 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Header Section - بسيط بس جذاب موت
+              // Header Section
               Container(
                 height: 300,
                 width: double.infinity,
@@ -144,8 +150,10 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          widget.categoryName,
+                                        AutoSizeText(
+                                          maxFontSize: 38,
+                                          minFontSize: 12,
+                                          widget.governMentName,
                                           style: const TextStyle(
                                             fontSize: 38,
                                             fontWeight: FontWeight.w800,
@@ -155,8 +163,14 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
                                           ),
                                         ),
                                         const SizedBox(height: 12),
+                                        widget.type != null
+                                            ? AutoSizeText(
+                                              "With Category: ${widget.type}",
+                                            )
+                                            : Text(""),
+                                        const SizedBox(height: 12),
                                         Text(
-                                          'Explore breathtaking ${widget.categoryName.toLowerCase()} destinations',
+                                          'Explore breathtaking ${widget.governMentName.toLowerCase()} destinations',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             color: Color.fromARGB(
@@ -277,14 +291,16 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
                       // Grid View
                       Padding(
                         padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                        child: CustomDiscoverPlacesGridView(
-                          categoryName: widget.categoryName,
+                        child: CustomDiscoverPlacesByCategoryGridView(
+                          governMentName: widget.governMentName,
+                          type: widget.type,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
+              SizedBox(height: 100),
               const FooterSection(),
             ],
           ),

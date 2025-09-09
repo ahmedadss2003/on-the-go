@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:on_the_go/core/const/app_colors.dart' as AppColors;
+import 'package:on_the_go/features/home/presentation/view/home_view.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/best_seller_trip_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/bg_container.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/footer_section.dart';
@@ -22,6 +23,7 @@ class HomeContent extends StatelessWidget {
       builder: (context, constraints) {
         final height = constraints.maxHeight;
         return SingleChildScrollView(
+          controller: HomeView.globalScrollController,
           child: Column(
             children: [
               BackgroundContainer(

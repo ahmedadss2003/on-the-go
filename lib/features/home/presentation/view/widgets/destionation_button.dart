@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
 
 class HoverMenuDestinationButton extends StatefulWidget {
   const HoverMenuDestinationButton({super.key});
@@ -67,10 +69,9 @@ class HoverMenuDestinationButtonState extends State<HoverMenuDestinationButton>
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
                     children: [
-                      _menuItem("Cairo"),
-                      _menuItem("Aswan"),
-                      _menuItem("Giza"),
-                      _menuItem("Alexandria"),
+                      _menuItem("Sharm El Sheikh Tours"),
+                      _menuItem("Cairo Tours"),
+                      _menuItem("Luxor Tours"),
                     ],
                   ),
                 ),
@@ -87,6 +88,10 @@ class HoverMenuDestinationButtonState extends State<HoverMenuDestinationButton>
       hoverColor: const Color.fromARGB(255, 3, 41, 106),
       borderRadius: BorderRadius.circular(8),
       onTap: () {
+        context.go(
+          DiscoverPlacesView.routeName,
+          extra: {'governmentName': text},
+        );
         _hideMenu();
       },
       child: Padding(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/contact_us_button.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key, required this.footerKey});
@@ -52,7 +53,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           Spacer(),
           width > tabletMobileWidth
-              ? CustomAppBarButton(onPressed: () {}, txt: "Contact Us")
+              ? CustomAppBarButton(
+                onPressed: () {
+                  _launchWhatsApp();
+                },
+                txt: "Contact Us",
+              )
               : const SizedBox(),
         ],
       ),
@@ -67,5 +73,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
       ],
     );
+  }
+
+  void _launchWhatsApp() async {
+    final Uri whatsapp = Uri.parse("https://wa.me/+201120919120");
+    if (await canLaunchUrl(whatsapp)) {
+      await launchUrl(whatsapp);
+    } else {
+      debugPrint("Could not launch WhatsApp");
+    }
   }
 }

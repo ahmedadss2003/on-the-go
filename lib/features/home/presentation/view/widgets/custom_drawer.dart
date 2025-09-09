@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -36,6 +37,8 @@ class CustomDrawer extends StatelessWidget {
               // Add Services navigation
             }),
             _buildDrawerItem(context, Icons.contact_mail, "Contact", () {
+              _launchWhatsApp();
+
               Navigator.pop(context);
               // Add Contact navigation
             }),
@@ -56,5 +59,14 @@ class CustomDrawer extends StatelessWidget {
       title: Text(title, style: const TextStyle(color: Colors.white)),
       onTap: onTap,
     );
+  }
+
+  void _launchWhatsApp() async {
+    final Uri whatsapp = Uri.parse("https://wa.me/+201120919120");
+    if (await canLaunchUrl(whatsapp)) {
+      await launchUrl(whatsapp);
+    } else {
+      debugPrint("Could not launch WhatsApp");
+    }
   }
 }

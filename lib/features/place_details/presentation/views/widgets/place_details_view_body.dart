@@ -5,13 +5,33 @@ import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:intl/intl.dart';
 import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
+import 'package:on_the_go/features/place_details/presentation/views/widgets/youtube_section.dart';
 
 class PlaceDetailsViewBody extends StatefulWidget {
   const PlaceDetailsViewBody({super.key, required this.tourModel});
   final TourModel tourModel;
+
   @override
   PlaceDetailsViewBodyState createState() => PlaceDetailsViewBodyState();
 }
+
+List<String> included = [
+  "Included",
+  "Return fly tickets",
+  "All transfers by A/C vehicle in Sharm el Sheikh and Cairo",
+  "Giza Pyramids, Sphinx and Kephren Temple",
+  "English speaking tour guide",
+  "Lunch in Cairo",
+  "Egyptian Museum",
+];
+
+List<String> notIncluded = [
+  "Not Included",
+  "Drinks on the Restaurant",
+  "Boat ride on the Nile",
+  "Any extras not mentioned in the program",
+  "Entrance Fees",
+];
 
 class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     with SingleTickerProviderStateMixin {
@@ -28,6 +48,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   bool _isBookingInProgress = false;
   late AnimationController _animController;
   late Animation<double> _fadeAnimation;
+  late ScrollController _scrollController; // Added ScrollController
 
   @override
   void initState() {
@@ -40,13 +61,31 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       parent: _animController,
       curve: Curves.easeInOut,
     );
+    _scrollController = ScrollController(); // Initialize ScrollController
     _animController.forward();
+  }
+
+  @override
+  void didUpdateWidget(PlaceDetailsViewBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if tourModel has changed
+    if (oldWidget.tourModel != widget.tourModel) {
+      // Scroll to top with animation when tourModel changes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          0.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
   }
 
   @override
   void dispose() {
     _controllers.values.forEach((controller) => controller.dispose());
     _animController.dispose();
+    _scrollController.dispose(); // Dispose ScrollController
     super.dispose();
   }
 
@@ -221,12 +260,18 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     );
   }
 
+  String extractYoutubeVideoId(String url) {
+    Uri uri = Uri.parse(url);
+    return uri.queryParameters['v'] ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
           SingleChildScrollView(
+            controller: _scrollController, // Attach ScrollController
             child: Column(
               children: [
                 _buildHeroSection(),
@@ -242,8 +287,8 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                     horizontal: 20,
                     vertical: 30,
                   ),
-                  child: CustomDiscoverPlacesGridView(
-                    categoryName: widget.tourModel.category,
+                  child: CustomDiscoverPlacesByCategoryGridView(
+                    governMentName: widget.tourModel.category,
                   ),
                 ),
               ],
@@ -402,6 +447,50 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             _buildTourInfo(),
             const SizedBox(height: 20),
             _buildIncludedSection(),
+            const SizedBox(height: 20),
+            // Add Video Section
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.maxWidth < 600;
+                    final isTablet = constraints.maxWidth < 900;
+                    final videoHeight =
+                        isMobile
+                            ? 200.0
+                            : isTablet
+                            ? 300.0
+                            : 400.0;
+
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: videoHeight,
+                        maxWidth: constraints.maxWidth,
+                      ),
+                      child:
+                          widget.tourModel.youtubeVideoUrl != null
+                              ? YoutubeVideoWidget(
+                                videoId: extractYoutubeVideoId(
+                                  widget.tourModel.youtubeVideoUrl!,
+                                ),
+                              )
+                              : const SizedBox(),
+                    );
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -439,19 +528,9 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                 'Duration',
               ),
               _buildStatItem(
-                Icons.groups,
-                '${widget.tourModel.ageRequirement}+',
-                'Min Age',
-              ),
-              _buildStatItem(
                 Icons.calendar_month,
                 widget.tourModel.availability,
                 'Available',
-              ),
-              _buildStatItem(
-                Icons.people,
-                widget.tourModel.numberOfPeople,
-                'Group Size',
               ),
             ],
           ),
@@ -587,30 +666,20 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
-        final includeList =
-            widget.tourModel.priceIncludes
-                .split(',')
-                .map((e) => e.trim())
-                .toList();
-        final notIncludeList =
-            widget.tourModel.priceExcludes
-                .split(',')
-                .map((e) => e.trim())
-                .toList();
 
         return isMobile
             ? Column(
               children: [
                 _buildIncludedCard(
                   'Included',
-                  includeList,
+                  included,
                   Colors.green,
                   Icons.check_circle,
                 ),
                 const SizedBox(height: 15),
                 _buildIncludedCard(
                   'Not Included',
-                  notIncludeList,
+                  notIncluded,
                   Colors.red,
                   Icons.cancel,
                 ),
@@ -621,7 +690,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                 Expanded(
                   child: _buildIncludedCard(
                     'Included',
-                    includeList,
+                    included,
                     Colors.green,
                     Icons.check_circle,
                   ),
@@ -630,7 +699,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                 Expanded(
                   child: _buildIncludedCard(
                     'Not Included',
-                    notIncludeList,
+                    notIncluded,
                     Colors.red,
                     Icons.cancel,
                   ),
@@ -1093,12 +1162,15 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     );
   }
 
-  String _formatTime(String timeString) {
-    try {
-      final parsedTime = DateFormat("HH:mm:ss").parse(timeString);
-      return DateFormat.jm().format(parsedTime);
-    } catch (e) {
-      return timeString;
-    }
+  String formatTimeOfDay(TimeOfDay timeOfDay) {
+    final now = DateTime.now();
+    final dateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      timeOfDay.hour,
+      timeOfDay.minute,
+    );
+    return DateFormat.jm().format(dateTime);
   }
 }

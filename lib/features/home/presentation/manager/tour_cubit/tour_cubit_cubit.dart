@@ -14,17 +14,34 @@ class TourCubitCubit extends Cubit<TourCubitState> {
     this.getBestSellerToursUseCase,
     this.getToursByCategoryUseCase,
     this.getToursByCategoryAndGovernorateUseCase,
-  ) : super(TourCubitInitial());
+  ) : super(TourCubitInitial()) {}
+
   final GetAllToursUseCase getAllToursUseCase;
   final GetBestSellerToursUseCase getBestSellerToursUseCase;
   final GetToursByCategoryUseCase getToursByCategoryUseCase;
   final GetToursByCategoryAndGovernorateUseCase
   getToursByCategoryAndGovernorateUseCase;
 
+  // Cache variables
+  List<TourModel>? _allToursCache;
+  List<TourModel>? _bestSellerToursCache;
+  final Map<String, List<TourModel>> _categoryCache = {};
+  final Map<String, List<TourModel>> _categoryGovernorateCache = {};
+
+  @override
+  Future<void> close() {
+    return super.close();
+  }
+
   Future<void> getAllTours() async {
+    if (_allToursCache != null) {
+      emit(TourCubitSuccess(_allToursCache!));
+      return;
+    }
     emit(TourCubitLoading());
     try {
       final tours = await getAllToursUseCase.call();
+      _allToursCache = tours;
       emit(TourCubitSuccess(tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));
@@ -32,19 +49,29 @@ class TourCubitCubit extends Cubit<TourCubitState> {
   }
 
   Future<void> getBestSellerTours() async {
+    if (_bestSellerToursCache != null) {
+      emit(TourCubitSuccess(_bestSellerToursCache!));
+      return;
+    }
     emit(TourCubitLoading());
     try {
       final tours = await getBestSellerToursUseCase.call();
+      _bestSellerToursCache = tours;
       emit(TourCubitSuccess(tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));
     }
   }
 
-  Future<void> getToursByCategory(String category) async {
+  Future<void> getToursByGovernMent(String category) async {
+    if (_categoryCache.containsKey(category)) {
+      emit(TourCubitSuccess(_categoryCache[category]!));
+      return;
+    }
     emit(TourCubitLoading());
     try {
       final tours = await getToursByCategoryUseCase.call(category);
+      _categoryCache[category] = tours;
       emit(TourCubitSuccess(tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));
@@ -55,12 +82,19 @@ class TourCubitCubit extends Cubit<TourCubitState> {
     String category,
     String governorate,
   ) async {
+    final key = '$category-$governorate';
+    if (_categoryGovernorateCache.containsKey(key)) {
+      emit(TourCubitSuccess(_categoryGovernorateCache[key]!));
+      return;
+    }
+
     emit(TourCubitLoading());
     try {
       final tours = await getToursByCategoryAndGovernorateUseCase.call(
         category,
         governorate,
       );
+      _categoryGovernorateCache[key] = tours;
       emit(TourCubitSuccess(tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));

@@ -14,12 +14,12 @@ class FirestoreServices {
     }).toList();
   }
 
-  Future<List<TourModel>> getToursByCategory(String categoryName) async {
+  Future<List<TourModel>> getToursByGovernMent(String governmentName) async {
     try {
       final snapshot =
           await firestore
               .collection('tours')
-              .where('category', isEqualTo: categoryName) // فلترة بالكاتيجوري
+              .where('governorate', isEqualTo: governmentName)
               .get();
 
       return snapshot.docs.map((doc) {
@@ -46,7 +46,7 @@ class FirestoreServices {
 
       return snapshot.docs.map((doc) {
         final data = doc.data();
-        data['id'] = doc.id; // نضيف الـ id
+        data['id'] = doc.id;
         return TourModel.fromJson(data);
       }).toList();
     } catch (e) {

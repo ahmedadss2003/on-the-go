@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_view_body.dart';
 
 class DiscoverPlacesView extends StatelessWidget {
   const DiscoverPlacesView({
     super.key,
-    required this.categoryName,
-    // required this.tourModel,
+    required this.governmentName,
+    this.type,
   });
   static const routeName = "/discover_places";
-  final String categoryName;
-  // final TourModel tourModel;
+  final String governmentName;
+  final String? type;
   @override
   Widget build(BuildContext context) {
-    return DiscoverPlacesViewBody(categoryName: categoryName);
+    return DiscoverPlacesViewBody(governMentName: governmentName, type: type);
   }
 }

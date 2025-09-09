@@ -18,7 +18,7 @@ class TourRepoImpl implements TourRepo {
 
   @override
   Future<List<TourModel>> getToursByCategory(String categoryName) {
-    return firestoreServices.getToursByCategory(categoryName);
+    return firestoreServices.getToursByGovernMent(categoryName);
   }
 
   @override
