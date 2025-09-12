@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:on_the_go/core/const/app_colors.dart' as AppColors;
 import 'package:on_the_go/features/home/presentation/view/home_view.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/How_Book_with_us.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/best_seller_trip_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/bg_container.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/footer_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/how_pay_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/most_popular_destination.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/review_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/slide_fade_animation.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/time_descover_widget.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/tour_filter.dart';
@@ -83,6 +85,11 @@ class HomeContent extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               HowPaySection(width: width),
+
+              const SizedBox(height: 20),
+              ReviewsSection(width: width),
+              const SizedBox(height: 20),
+              HowBookSection(width: width),
               const SizedBox(height: 50),
               FooterSection(key: footerKey),
             ],

@@ -17,20 +17,29 @@ class _FilterSectionState extends State<FilterSection> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 600;
-        final isTablet = constraints.maxWidth < 1000;
-        double width = MediaQuery.of(context).size.width;
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isMobile = screenWidth < 600;
+        final isTablet = screenWidth < 1000;
+
+        // More responsive width calculation
+        double containerWidth;
+        if (isMobile) {
+          containerWidth = screenWidth - 32; // Account for screen padding
+        } else if (isTablet) {
+          containerWidth = screenWidth * 0.85;
+        } else {
+          containerWidth = screenWidth * 0.5;
+        }
+
         return Container(
-          height: 90,
-          width:
-              isMobile
-                  ? width
-                  : isTablet
-                  ? width * 0.9
-                  : width * 0.5,
+          constraints: BoxConstraints(
+            maxWidth: containerWidth,
+            minHeight: isMobile ? 70 : 90,
+          ),
+          width: containerWidth,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(33),
+            borderRadius: BorderRadius.circular(isMobile ? 25 : 33),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.2),
@@ -39,7 +48,7 @@ class _FilterSectionState extends State<FilterSection> {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(isMobile ? 8 : 12),
           child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
         );
       },
@@ -47,33 +56,36 @@ class _FilterSectionState extends State<FilterSection> {
   }
 
   Widget _buildMobileLayout() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: WhereToButton(
-            selectedGovernment: selectedGovernment,
-            onGovernmentSelected: (government) {
-              setState(() {
-                selectedGovernment = government;
-              });
-            },
+    return IntrinsicHeight(
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: WhereToButton(
+              selectedGovernment: selectedGovernment,
+              onGovernmentSelected: (government) {
+                setState(() {
+                  selectedGovernment = government;
+                });
+              },
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: TypeButton(
-            selectedType: selectedType,
-            onTypeSelected: (type) {
-              setState(() {
-                selectedType = type;
-              });
-            },
+          const SizedBox(width: 4),
+          Expanded(
+            flex: 3,
+            child: TypeButton(
+              selectedType: selectedType,
+              onTypeSelected: (type) {
+                setState(() {
+                  selectedType = type;
+                });
+              },
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        SearchButton(governmentName: selectedGovernment, type: selectedType),
-      ],
+          const SizedBox(width: 4),
+          SearchButton(governmentName: selectedGovernment, type: selectedType),
+        ],
+      ),
     );
   }
 
@@ -446,29 +458,16 @@ class SearchButton extends StatelessWidget {
         backgroundColor: Colors.orange,
         elevation: 6,
         shadowColor: Colors.orange.withOpacity(0.4),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        padding: EdgeInsets.all(isMobile ? 10 : 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(isMobile ? 15 : 20),
+        ),
+        padding: EdgeInsets.all(isMobile ? 8 : 14),
+        minimumSize: Size(isMobile ? 40 : 60, isMobile ? 40 : 50),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.search_rounded,
-            color: Colors.white,
-            size: isMobile ? 20 : 24,
-          ),
-          if (!isMobile) ...[
-            const SizedBox(width: 8),
-            const Text(
-              'Search',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ],
+      child: Icon(
+        Icons.search_rounded,
+        color: Colors.white,
+        size: isMobile ? 18 : 24,
       ),
     );
   }
@@ -519,7 +518,10 @@ class _FilterButtonState extends State<FilterButton>
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isVerySmall = screenWidth < 360;
+
     return MouseRegion(
       onEnter:
           (_) => setState(() {
@@ -549,7 +551,7 @@ class _FilterButtonState extends State<FilterButton>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(isMobile ? 15 : 20),
               border: Border.all(
                 color: _isHovered ? Colors.orange.shade300 : Colors.grey[300]!,
                 width: 1.5,
@@ -572,8 +574,8 @@ class _FilterButtonState extends State<FilterButton>
                       ],
             ),
             padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 8 : 12,
-              vertical: isMobile ? 8 : 10,
+              horizontal: isMobile ? 6 : 12,
+              vertical: isMobile ? 6 : 10,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -584,36 +586,42 @@ class _FilterButtonState extends State<FilterButton>
                       _isHovered
                           ? Colors.orange.shade700
                           : Colors.blue.shade600,
-                  size: isMobile ? 20 : 24,
+                  size: isMobile ? 18 : 24,
                 ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.label,
-                      style: TextStyle(
-                        color:
-                            _isHovered
-                                ? Colors.orange.shade700
-                                : Colors.blue.shade600,
-                        fontSize: isMobile ? 12 : 14,
-                        fontWeight: FontWeight.w600,
+                SizedBox(width: isMobile ? 4 : 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.label,
+                        style: TextStyle(
+                          color:
+                              _isHovered
+                                  ? Colors.orange.shade700
+                                  : Colors.blue.shade600,
+                          fontSize: isVerySmall ? 10 : (isMobile ? 11 : 14),
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      widget.hint,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: isMobile ? 10 : 12,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ],
+                      if (!isVerySmall) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          widget.hint,
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: isMobile ? 9 : 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),

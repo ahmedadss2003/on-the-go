@@ -44,15 +44,6 @@ class _TourCardState extends State<TourCard>
     return GestureDetector(
       onTap: () {
         context.go(PlaceDetailsView.routeName, extra: widget.tourModel);
-        Future.delayed(Duration(milliseconds: 100), () {
-          if (Scrollable.maybeOf(context) != null) {
-            Scrollable.ensureVisible(
-              context,
-              duration: Duration(milliseconds: 800),
-              curve: Curves.easeInOut,
-            );
-          }
-        });
       },
       child: MouseRegion(
         onEnter: (_) => setState(() => isHover = true),
@@ -432,15 +423,17 @@ class _TourCardState extends State<TourCard>
   }
 
   double _getStatusBadgeWidth() {
-    // Approximate width calculation for status badge positioning
     return widget.tourModel.status.length * 8.0 + 16;
   }
 
   int _getDiscountPercent() =>
-      ((widget.tourModel.discount / widget.tourModel.priceAdult) * 100).round();
+      widget.tourModel.discount.clamp(0.0, 100.0).round();
 
-  double _getFinalPrice() =>
-      widget.tourModel.priceAdult - widget.tourModel.discount;
+  int _getFinalPrice() {
+    final priceAdult = widget.tourModel.priceAdult ?? 0.0;
+    final discount = widget.tourModel.discount.clamp(0.0, 100.0);
+    return (priceAdult * (1 - discount / 100)).round();
+  }
 
   int _getRatingStars() {
     try {

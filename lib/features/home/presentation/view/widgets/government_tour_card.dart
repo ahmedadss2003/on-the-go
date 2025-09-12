@@ -14,7 +14,8 @@ class GovernmentFilterTourCard extends StatefulWidget {
 }
 
 class _GovernmentFilterTourCardState extends State<GovernmentFilterTourCard> {
-  Color containerColor = Colors.white;
+  bool isHover = false;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -25,55 +26,88 @@ class _GovernmentFilterTourCardState extends State<GovernmentFilterTourCard> {
         );
       },
       child: MouseRegion(
-        onEnter: (event) {
-          setState(() {
-            containerColor = Colors.grey[200]!;
-          });
-        },
-        onExit: (event) {
-          setState(() {
-            containerColor = Colors.white;
-          });
-        },
-        child: Container(
-          width: 150,
-          // margin: const EdgeInsets.all(10),
+        onEnter: (_) => setState(() => isHover = true),
+        onExit: (_) => setState(() => isHover = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 160,
           decoration: BoxDecoration(
-            color: containerColor,
-            borderRadius: BorderRadius.circular(16),
+            color: isHover ? Colors.blue.shade50 : Colors.white,
+            borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color:
+                    isHover
+                        ? Colors.blue.shade100.withOpacity(0.3)
+                        : Colors.grey.shade200.withOpacity(0.2),
+                spreadRadius: isHover ? 3 : 2,
+                blurRadius: isHover ? 12 : 8,
+                offset: Offset(0, isHover ? 6 : 4),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image section
+              // Image section with subtle overlay
               ClipRRect(
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                child: Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(widget.governmentModel.image),
-                      fit: BoxFit.cover,
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(widget.governmentModel.image),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                  ),
+                    // Subtle overlay for hover effect
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      height: 200,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black.withOpacity(isHover ? 0.15 : 0.1),
+                            Colors.transparent,
+                          ],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                        ),
+                      ),
+                    ),
+                    // Subtle shimmer effect on hover
+                    if (isHover)
+                      AnimatedOpacity(
+                        opacity: isHover ? 0.3 : 0.0,
+                        duration: const Duration(milliseconds: 300),
+                        child: Container(
+                          height: 200,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                Colors.white.withOpacity(0.2),
+                                Colors.transparent,
+                              ],
+                              begin: const Alignment(-1.5, -1.0),
+                              end: const Alignment(1.5, 1.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-
               // Content section
               Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -81,24 +115,53 @@ class _GovernmentFilterTourCardState extends State<GovernmentFilterTourCard> {
                     AutoSizeText(
                       widget.governmentModel.name,
                       style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2C3E50),
-                        letterSpacing: -0.1,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF1E2A3C),
+                        letterSpacing: -0.2,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-
-                    const SizedBox(height: 12),
-
+                    const SizedBox(height: 10),
                     // Description
                     AutoSizeText(
-                      maxLines: 2,
                       widget.governmentModel.description,
                       style: TextStyle(
-                        fontSize: 16,
-                        height: 1.5,
-                        color: Color(0xFF5A6C7D),
+                        fontSize: 14,
+                        height: 1.4,
+                        color: const Color(0xFF4B5EAA).withOpacity(0.8),
                         letterSpacing: 0.1,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    // Explore Button
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: AnimatedOpacity(
+                        opacity: isHover ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade600,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            'Explore',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],

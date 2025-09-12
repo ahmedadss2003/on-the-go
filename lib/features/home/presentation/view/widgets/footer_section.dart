@@ -13,7 +13,7 @@ class FooterSection extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
+          colors: [Color.fromARGB(255, 14, 72, 69), Color(0xFF16213E)],
         ),
       ),
       child: Padding(
@@ -61,24 +61,6 @@ class FooterSection extends StatelessWidget {
   Widget _buildBrandSection() {
     return Column(
       children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              colors: [Color(0xFF4A90E2), Color(0xFF7B68EE)],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF4A90E2).withOpacity(0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: const Icon(Icons.landscape, size: 40, color: Colors.white),
-        ),
         const SizedBox(height: 16),
         ShaderMask(
           shaderCallback:
@@ -86,7 +68,7 @@ class FooterSection extends StatelessWidget {
                 colors: [Color(0xFF4A90E2), Color(0xFF7B68EE)],
               ).createShader(bounds),
           child: const Text(
-            'Sharm Desert Safari',
+            'Why Customers Choose Us ?',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -95,41 +77,15 @@ class FooterSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          'Unforgettable Adventures in the Heart of Egypt',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey.shade300,
-            fontStyle: FontStyle.italic,
-          ),
-          textAlign: TextAlign.center,
-        ),
       ],
     );
   }
 
   Widget _buildNavigationSection() {
     final links = [
-      {
-        'text': 'Desert Tours',
-        'url':
-            'https://www.instagram.com/sharmdesertsafari?igsh=MWIwYXF3MnIzeDdwcg%3D%3D&utm_source=qr',
-      },
-      {
-        'text': 'About Us',
-        'url':
-            'https://www.instagram.com/sharmdesertsafari?igsh=MWIwYXF3MnIzeDdwcg%3D%3D&utm_source=qr',
-      },
-      {
-        'text': 'Gallery',
-        'url':
-            'https://www.facebook.com/profile.php?id=61575163371185&mibextid=wwXIfr&mibextid=wwXIfr',
-      },
-      {
-        'text': 'Contact',
-        'url':
-            'https://www.facebook.com/profile.php?id=61575163371185&mibextid=wwXIfr&mibextid=wwXIfr',
-      },
+      {'text': 'Best Service'},
+      {'text': 'Cheapest Prices'},
+      {'text': 'Very easy book'},
     ];
 
     return Wrap(
@@ -138,10 +94,7 @@ class FooterSection extends StatelessWidget {
       runSpacing: 16,
       children:
           links
-              .map(
-                (link) =>
-                    OptimizedFooterLink(text: link['text']!, url: link['url']!),
-              )
+              .map((link) => OptimizedFooterLink(text: link['text']!))
               .toList(),
     );
   }
@@ -177,7 +130,7 @@ class FooterSection extends StatelessWidget {
             const SizedBox(width: 20),
             OptimizedSocialIcon(
               icon: Icons.phone,
-              url: 'tel:+201234567890',
+              url: 'tel:+201120919120',
               color: const Color(0xFF25D366),
             ),
           ],
@@ -214,7 +167,7 @@ class FooterSection extends StatelessWidget {
               Icon(Icons.email, color: const Color(0xFF4A90E2), size: 18),
               const SizedBox(width: 8),
               AutoSizeText(
-                'info@sharmdesertsafari.com',
+                '+201120919120',
                 style: TextStyle(color: Colors.grey.shade300, fontSize: 14),
               ),
             ],
@@ -228,7 +181,7 @@ class FooterSection extends StatelessWidget {
     return Column(
       children: [
         Text(
-          '© 2025 Sharm Desert Safari. All rights reserved.',
+          '© 2025 On The Beach Excursions.',
           style: TextStyle(
             color: Colors.grey.shade500,
             fontSize: 14,
@@ -238,7 +191,7 @@ class FooterSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Made with ❤️ for adventure seekers',
+          'Made with Mask Team for adventure seekers',
           style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
           textAlign: TextAlign.center,
         ),
@@ -249,9 +202,8 @@ class FooterSection extends StatelessWidget {
 
 class OptimizedFooterLink extends StatefulWidget {
   final String text;
-  final String url;
 
-  const OptimizedFooterLink({required this.text, required this.url, super.key});
+  const OptimizedFooterLink({required this.text, super.key});
 
   @override
   State<OptimizedFooterLink> createState() => _OptimizedFooterLinkState();
@@ -267,7 +219,7 @@ class _OptimizedFooterLinkState extends State<OptimizedFooterLink> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTap: () => _launchUrl(widget.url),
+        onTap: () {},
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

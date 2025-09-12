@@ -3,7 +3,26 @@ import 'package:on_the_go/features/home/presentation/view/widgets/destionation_b
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({super.key});
+  const CustomDrawer({super.key, required this.footerKey});
+  final GlobalKey footerKey;
+
+  void _scrollToFooter(BuildContext context) {
+    Scrollable.ensureVisible(
+      footerKey.currentContext!,
+      alignment: 0.0,
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _scrollToHowBooking(BuildContext context) {
+    Scrollable.ensureVisible(
+      footerKey.currentContext!,
+      alignment: -8.0,
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +47,12 @@ class CustomDrawer extends StatelessWidget {
               ],
             ),
             SizedBox(height: 6),
-            _buildDrawerItem(context, Icons.info_outline, "About", () {
+            _buildDrawerItem(context, Icons.info_outline, "About Us", () {
+              _scrollToFooter(context);
               Navigator.pop(context);
-              // Add About navigation
             }),
-            _buildDrawerItem(context, Icons.room_service, "Services", () {
+            _buildDrawerItem(context, Icons.room_service, "How Book", () {
+              _scrollToHowBooking(context);
               Navigator.pop(context);
               // Add Services navigation
             }),
@@ -40,7 +60,6 @@ class CustomDrawer extends StatelessWidget {
               _launchWhatsApp();
 
               Navigator.pop(context);
-              // Add Contact navigation
             }),
           ],
         ),

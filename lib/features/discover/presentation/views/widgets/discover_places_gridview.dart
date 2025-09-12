@@ -87,9 +87,15 @@ class _CustomDiscoverPlacesByCategoryGridViewState
   }
 
   double _getChildAspectRatio(double width) {
-    if (width > 1200) return 0.75;
-    if (width > 900) return 0.8;
-    if (width > 600) return 0.75;
-    return 1.4;
+    if (width > 1322) return 0.7;
+    if (width <= 290) return 0.56;
+
+    if (width < 490) return 0.9;
+    if (width > 994) return 0.62;
+    if (width < 870) return 0.7;
+    if (width > 750) return 0.9;
+    if (width < 750) return 0.6;
+    if (width > 650) return 1.1;
+    return 0.9;
   }
 }

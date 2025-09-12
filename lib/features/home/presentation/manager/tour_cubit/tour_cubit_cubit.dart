@@ -14,7 +14,7 @@ class TourCubitCubit extends Cubit<TourCubitState> {
     this.getBestSellerToursUseCase,
     this.getToursByCategoryUseCase,
     this.getToursByCategoryAndGovernorateUseCase,
-  ) : super(TourCubitInitial()) {}
+  ) : super(TourCubitInitial());
 
   final GetAllToursUseCase getAllToursUseCase;
   final GetBestSellerToursUseCase getBestSellerToursUseCase;
@@ -35,14 +35,14 @@ class TourCubitCubit extends Cubit<TourCubitState> {
 
   Future<void> getAllTours() async {
     if (_allToursCache != null) {
-      emit(TourCubitSuccess(_allToursCache!));
+      emit(TourCubitSuccess(tours: _allToursCache!));
       return;
     }
     emit(TourCubitLoading());
     try {
       final tours = await getAllToursUseCase.call();
       _allToursCache = tours;
-      emit(TourCubitSuccess(tours));
+      emit(TourCubitSuccess(tours: tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));
     }
@@ -50,29 +50,44 @@ class TourCubitCubit extends Cubit<TourCubitState> {
 
   Future<void> getBestSellerTours() async {
     if (_bestSellerToursCache != null) {
-      emit(TourCubitSuccess(_bestSellerToursCache!));
+      emit(TourCubitSuccess(tours: _bestSellerToursCache!));
       return;
     }
     emit(TourCubitLoading());
     try {
       final tours = await getBestSellerToursUseCase.call();
       _bestSellerToursCache = tours;
-      emit(TourCubitSuccess(tours));
+      emit(TourCubitSuccess(tours: tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));
     }
   }
 
-  Future<void> getToursByGovernMent(String category) async {
+  Future<void> getToursByGovernMent(String governMentName) async {
+    if (_categoryCache.containsKey(governMentName)) {
+      emit(TourCubitSuccess(tours: _categoryCache[governMentName]!));
+      return;
+    }
+    emit(TourCubitLoading());
+    try {
+      final tours = await getToursByCategoryUseCase.call(governMentName);
+      _categoryCache[governMentName] = tours;
+      emit(TourCubitSuccess(tours: tours));
+    } catch (e) {
+      emit(TourCubitError(e.toString()));
+    }
+  }
+
+  Future<void> getToursByCategory(String category) async {
     if (_categoryCache.containsKey(category)) {
-      emit(TourCubitSuccess(_categoryCache[category]!));
+      emit(TourCubitSuccess(tours: _categoryCache[category]!));
       return;
     }
     emit(TourCubitLoading());
     try {
       final tours = await getToursByCategoryUseCase.call(category);
       _categoryCache[category] = tours;
-      emit(TourCubitSuccess(tours));
+      emit(TourCubitSuccess(tours: tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));
     }
@@ -84,7 +99,7 @@ class TourCubitCubit extends Cubit<TourCubitState> {
   ) async {
     final key = '$category-$governorate';
     if (_categoryGovernorateCache.containsKey(key)) {
-      emit(TourCubitSuccess(_categoryGovernorateCache[key]!));
+      emit(TourCubitSuccess(tours: _categoryGovernorateCache[key]!));
       return;
     }
 
@@ -95,9 +110,27 @@ class TourCubitCubit extends Cubit<TourCubitState> {
         governorate,
       );
       _categoryGovernorateCache[key] = tours;
-      emit(TourCubitSuccess(tours));
+      emit(TourCubitSuccess(tours: tours));
     } catch (e) {
       emit(TourCubitError(e.toString()));
     }
+  }
+
+  // Method to clear cache if needed
+  void clearCache() {
+    _allToursCache = null;
+    _bestSellerToursCache = null;
+    _categoryCache.clear();
+    _categoryGovernorateCache.clear();
+  }
+
+  // Method to clear specific cache
+  void clearCategoryCache(String category) {
+    _categoryCache.remove(category);
+  }
+
+  void clearGovernorateCache(String category, String governorate) {
+    final key = '$category-$governorate';
+    _categoryGovernorateCache.remove(key);
   }
 }

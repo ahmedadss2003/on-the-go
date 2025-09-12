@@ -71,4 +71,12 @@ class FirestoreServices {
       throw Exception("Failed to fetch best seller tours: $e");
     }
   }
+
+  Future<void> bookTour(Map<String, dynamic> bookingData) async {
+    try {
+      await firestore.collection('Booking').add(bookingData);
+    } catch (e) {
+      throw Exception("Failed to book tour: $e");
+    }
+  }
 }

@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:intl/intl.dart';
 import 'package:on_the_go/core/models/tour_model.dart';
+import 'package:on_the_go/features/discover/presentation/manager/booking_cubit/booking_cubit.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
 import 'package:on_the_go/features/place_details/presentation/views/widgets/youtube_section.dart';
 
@@ -16,7 +18,6 @@ class PlaceDetailsViewBody extends StatefulWidget {
 }
 
 List<String> included = [
-  "Included",
   "Return fly tickets",
   "All transfers by A/C vehicle in Sharm el Sheikh and Cairo",
   "Giza Pyramids, Sphinx and Kephren Temple",
@@ -26,7 +27,6 @@ List<String> included = [
 ];
 
 List<String> notIncluded = [
-  "Not Included",
   "Drinks on the Restaurant",
   "Boat ride on the Nile",
   "Any extras not mentioned in the program",
@@ -40,7 +40,6 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     'name': TextEditingController(),
     'email': TextEditingController(),
     'phone': TextEditingController(),
-    'hotel': TextEditingController(),
   };
 
   DateTime? selectedDate;
@@ -48,7 +47,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   bool _isBookingInProgress = false;
   late AnimationController _animController;
   late Animation<double> _fadeAnimation;
-  late ScrollController _scrollController; // Added ScrollController
+  late ScrollController _scrollController;
 
   @override
   void initState() {
@@ -61,16 +60,23 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       parent: _animController,
       curve: Curves.easeInOut,
     );
-    _scrollController = ScrollController(); // Initialize ScrollController
+    _scrollController = ScrollController();
     _animController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0.0,
+          duration: Duration(milliseconds: 800),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   void didUpdateWidget(PlaceDetailsViewBody oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Check if tourModel has changed
     if (oldWidget.tourModel != widget.tourModel) {
-      // Scroll to top with animation when tourModel changes
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollController.animateTo(
           0.0,
@@ -85,24 +91,41 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   void dispose() {
     _controllers.values.forEach((controller) => controller.dispose());
     _animController.dispose();
-    _scrollController.dispose(); // Dispose ScrollController
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _submitBooking() async {
-    if (!_formKey.currentState!.validate() || selectedDate == null) {
-      _showMessage('Please fill all fields and select a date', isError: true);
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (selectedDate == null) {
+      _showMessage('Please select a departure date', isError: true);
       return;
     }
 
     setState(() => _isBookingInProgress = true);
 
-    // Simulate booking process
-    await Future.delayed(const Duration(seconds: 2));
+    // Calculate total price (same as in _buildBookingForm)
+    final discountAmount =
+        widget.tourModel.priceAdult * (widget.tourModel.discount / 100);
+    final price = (widget.tourModel.priceAdult - discountAmount).round();
+    final totalPrice =
+        (adults * price + children * widget.tourModel.priceChild).toDouble();
 
-    setState(() => _isBookingInProgress = false);
-    _showMessage('Booking confirmed! We\'ll contact you soon.');
-    _resetForm();
+    final bookingData = {
+      'full_name': _controllers['name']!.text.trim(),
+      'email': _controllers['email']!.text.trim(),
+      'phone_number': _controllers['phone']!.text.trim(),
+      'num_adults': adults,
+      'num_children': children,
+      'departure_date': selectedDate!.toIso8601String().split('T')[0],
+      'tour_name': widget.tourModel.title,
+      'total_price': totalPrice,
+      'is_read': false, // Include is_read for consistency with dashboard
+    };
+    context.read<BookingCubit>().bookTour(bookingData);
   }
 
   void _showMessage(String message, {bool isError = false}) {
@@ -268,38 +291,52 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            controller: _scrollController, // Attach ScrollController
-            child: Column(
-              children: [
-                _buildHeroSection(),
-                _buildMainContent(),
-                const SizedBox(height: 20),
-                const AutoSizeText(
-                  "Similar and Most Popular Tours",
-                  maxLines: 1,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 30,
+      body: BlocListener<BookingCubit, BookingState>(
+        listener: (context, state) {
+          setState(() {
+            _isBookingInProgress = false;
+          });
+
+          if (state is BookingSuccess) {
+            _showMessage('Booking successful! We\'ll contact you soon.');
+            _resetForm();
+          } else if (state is BookingFailure) {
+            _showMessage('Booking failed: ${state.error}', isError: true);
+          }
+        },
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                children: [
+                  _buildHeroSection(),
+                  _buildMainContent(),
+                  const SizedBox(height: 20),
+                  const AutoSizeText(
+                    "Similar and Most Popular Tours",
+                    maxLines: 1,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                   ),
-                  child: CustomDiscoverPlacesByCategoryGridView(
-                    governMentName: widget.tourModel.category,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 30,
+                    ),
+                    child: CustomDiscoverPlacesByCategoryGridView(
+                      governMentName: widget.tourModel.governorate,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          if (_isBookingInProgress)
-            Container(
-              color: Colors.black54,
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-        ],
+            if (_isBookingInProgress)
+              Container(
+                color: Colors.black54,
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -351,11 +388,6 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                     widget.tourModel.timeOfTour,
                     'Duration',
                     Icons.access_time,
-                  ),
-                  _buildHeroStat(
-                    widget.tourModel.numberOfPeople,
-                    'Max Group',
-                    Icons.group,
                   ),
                 ],
               ),
@@ -448,49 +480,48 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             const SizedBox(height: 20),
             _buildIncludedSection(),
             const SizedBox(height: 20),
-            // Add Video Section
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isMobile = constraints.maxWidth < 600;
-                    final isTablet = constraints.maxWidth < 900;
-                    final videoHeight =
-                        isMobile
-                            ? 200.0
-                            : isTablet
-                            ? 300.0
-                            : 400.0;
+            // Container(
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(12),
+            //     boxShadow: [
+            //       BoxShadow(
+            //         color: Colors.grey.withOpacity(0.2),
+            //         blurRadius: 10,
+            //         offset: const Offset(0, 4),
+            //       ),
+            //     ],
+            //   ),
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(12),
+            //     child: LayoutBuilder(
+            //       builder: (context, constraints) {
+            //         final isMobile = constraints.maxWidth < 600;
+            //         final isTablet = constraints.maxWidth < 900;
+            //         final videoHeight =
+            //             isMobile
+            //                 ? 200.0
+            //                 : isTablet
+            //                 ? 300.0
+            //                 : 400.0;
 
-                    return ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: videoHeight,
-                        maxWidth: constraints.maxWidth,
-                      ),
-                      child:
-                          widget.tourModel.youtubeVideoUrl != null
-                              ? YoutubeVideoWidget(
-                                videoId: extractYoutubeVideoId(
-                                  widget.tourModel.youtubeVideoUrl!,
-                                ),
-                              )
-                              : const SizedBox(),
-                    );
-                  },
-                ),
-              ),
-            ),
+            //         return ConstrainedBox(
+            //           constraints: BoxConstraints(
+            //             maxHeight: videoHeight,
+            //             maxWidth: constraints.maxWidth,
+            //           ),
+            //           child:
+            //               widget.tourModel.youtubeVideoUrl != null
+            //                   ? YoutubeVideoWidget(
+            //                     videoId: extractYoutubeVideoId(
+            //                       widget.tourModel.youtubeVideoUrl!,
+            //                     ),
+            //                   )
+            //                   : const SizedBox(),
+            //         );
+            //       },
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -567,31 +598,52 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   }
 
   Widget _buildDescription() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xff1a73e8), width: 1.5),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: ExpandedTile(
-        title: const Text(
-          'Description',
-          style: TextStyle(
-            color: Color(0xFF1a73e8),
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: const Color(0xff1a73e8), width: 1.5),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 14,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: ExpandedTile(
+              title: Text(
+                'Description',
+                style: TextStyle(
+                  color: Color(0xFF1a73e8),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              content: Text(
+                widget.tourModel.description,
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 1.5,
+                  color: Colors.grey[800],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              controller: ExpandedTileController(),
+              leading: Icon(
+                Icons.description,
+                size: 24,
+                color: Color(0xFF1a73e8),
+              ),
+            ),
           ),
         ),
-        content: Text(
-          widget.tourModel.description,
-          style: TextStyle(fontSize: 18, height: 1.5, color: Colors.grey[800]),
-        ),
-        controller: ExpandedTileController(),
-        leading: const Icon(
-          Icons.description,
-          size: 24,
-          color: Color(0xFF1a73e8),
-        ),
-      ),
+      ],
     );
   }
 
@@ -741,34 +793,38 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             ],
           ),
           const SizedBox(height: 10),
-          ...items.map(
-            (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                children: [
-                  Icon(
-                    title == 'Included' ? Icons.check : Icons.close,
-                    color: color[600],
-                    size: 14,
+          ...items
+              .map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      Icon(
+                        title == 'Included' ? Icons.check : Icons.close,
+                        color: color[600],
+                        size: 14,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          item,
+                          style: TextStyle(color: color[700], fontSize: 12),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      item,
-                      style: TextStyle(color: color[700], fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                ),
+              )
+              .toList(),
         ],
       ),
     );
   }
 
   Widget _buildBookingForm() {
-    final price = (widget.tourModel.priceAdult - widget.tourModel.discount);
+    final discountAmount =
+        widget.tourModel.priceAdult * (widget.tourModel.discount / 100);
+    final price = (widget.tourModel.priceAdult - discountAmount).round();
     final totalPrice =
         (adults * price + children * widget.tourModel.priceChild).toString();
 
@@ -776,7 +832,9 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       duration: const Duration(milliseconds: 500),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.white, Colors.blue[50]!]),
+        gradient: LinearGradient(
+          colors: [const Color.fromARGB(255, 209, 182, 204), Colors.blue[50]!],
+        ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -825,8 +883,8 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  'Book This Adventure',
+                AutoSizeText(
+                  'Book This Tour',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -871,12 +929,6 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
         'hint': '+201068561700',
         'icon': Icons.phone,
         'label': 'WhatsApp Number',
-      },
-      {
-        'key': 'hotel',
-        'hint': 'Hilton Waterfront',
-        'icon': Icons.hotel,
-        'label': 'Hotel Name',
       },
     ];
 
@@ -1109,8 +1161,8 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                   children: [
                     Icon(Icons.rocket_launch, color: Colors.white),
                     SizedBox(width: 8),
-                    Text(
-                      'Book Your Adventure',
+                    AutoSizeText(
+                      'Book Your Tour',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

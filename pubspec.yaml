@@ -50,6 +50,8 @@ dependencies:
   firebase_core: ^4.1.0
   cloud_firestore: ^6.0.1
   get_it: ^8.2.0
+  dio: ^5.9.0
+  flutter_web_browser: ^0.17.3
 
 dev_dependencies:
   flutter_test:

@@ -21,7 +21,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
         preferredSize: const Size.fromHeight(80),
         child: CustomAppBar(footerKey: _footerKey),
       ),
-      endDrawer: width < 800 ? const CustomDrawer() : null,
+      endDrawer: width < 800 ? CustomDrawer(footerKey: _footerKey) : null,
       body: HomeContent(footerKey: _footerKey),
     );
   }

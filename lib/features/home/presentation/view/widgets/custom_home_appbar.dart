@@ -18,6 +18,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
+  void _scrollToHowBooking(BuildContext context) {
+    Scrollable.ensureVisible(
+      footerKey.currentContext!,
+      alignment: 9.0,
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -37,7 +46,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   HoverMenuDestinationButton(),
                   SizedBox(width: 30),
-                  HoverMenuDestinationButton(),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        _scrollToHowBooking(context);
+                      },
+                      txt: "How Book With Us",
+                    ),
+                  ),
                   SizedBox(width: 30),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),

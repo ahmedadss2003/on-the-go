@@ -168,49 +168,45 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
               ),
               const SizedBox(width: 8),
               Text(
-                widget.tour.governorate,
+                widget.tour.title,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF666666),
                 ),
               ),
+            ],
+          ),
+          Row(
+            children: [
               const Spacer(),
+
               const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
               const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
               const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
               const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
               const Icon(Icons.star, color: Color(0xFFFFA726), size: 16),
               const SizedBox(width: 4),
-              Text(
+              AutoSizeText(
                 widget.tour.rating.toString() ??
                     "4.5", // You might want to add rating to TourModel
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
               const SizedBox(width: 4),
-              Text(
-                widget.tour.review.toString() ??
+              AutoSizeText(
+                "(${widget.tour.review.toString()})" ??
                     "20", // You might want to add review count to TourModel
                 style: TextStyle(fontSize: 12, color: Color(0xFF999999)),
               ),
+              const Spacer(),
             ],
           ),
           const SizedBox(height: 8),
-          AutoSizeText(
-            widget.tour.title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A365D),
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 12),
+
           AutoSizeText(
             minFontSize: 12,
             widget.tour.description,
-            maxFontSize: 20,
+            maxFontSize: 30,
             style: const TextStyle(
               // fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -220,12 +216,12 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
-          _buildDetailRow(widget.tour.timeOfTour, null),
-          const SizedBox(height: 8),
+          _buildDetailRow("duration: ${widget.tour.timeOfTour}", null),
+          const SizedBox(height: 10),
           _buildDetailRow(widget.tour.governorate, null),
-          const SizedBox(height: 8),
-          _buildDetailRow('Age: ${widget.tour.ageRequirement}', null),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
+          _buildDetailRow('Avilability: ${widget.tour.availability}', null),
+          const SizedBox(height: 10),
 
           Row(
             children: [
@@ -300,10 +296,15 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
           const SizedBox(width: 8),
         ],
         Expanded(
-          child: Text(
+          child: AutoSizeText(
             text,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF666666)),
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFF666666),
+              fontWeight: FontWeight.w500,
+            ),
             maxLines: 1,
+
             overflow: TextOverflow.ellipsis,
           ),
         ),

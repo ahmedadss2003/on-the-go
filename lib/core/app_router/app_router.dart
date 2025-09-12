@@ -23,7 +23,20 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: PlaceDetailsView.routeName,
       builder: (context, state) {
-        final tourModel = state.extra as TourModel;
+        final tourModel =
+            state.extra is Map<String, dynamic>
+                ? TourModel.fromJson(state.extra as Map<String, dynamic>)
+                : state.extra as TourModel;
+        return PlaceDetailsView(tourModel: tourModel);
+      },
+    ),
+    GoRoute(
+      path: PlaceDetailsView.routeName,
+      builder: (context, state) {
+        final tourModel =
+            state.extra is Map<String, dynamic>
+                ? TourModel.fromJson(state.extra as Map<String, dynamic>)
+                : state.extra as TourModel;
         return PlaceDetailsView(tourModel: tourModel);
       },
     ),

@@ -7,9 +7,13 @@ final class TourCubitInitial extends TourCubitState {}
 
 final class TourCubitLoading extends TourCubitState {}
 
-final class TourCubitSuccess extends TourCubitState {
+class TourCubitSuccess extends TourCubitState {
   final List<TourModel> tours;
-  TourCubitSuccess(this.tours);
+
+  TourCubitSuccess({required this.tours}); // Named parameter
+
+  @override
+  List<Object> get props => [tours];
 }
 
 final class TourCubitError extends TourCubitState {
