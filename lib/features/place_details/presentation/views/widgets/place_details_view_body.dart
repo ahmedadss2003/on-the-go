@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:intl/intl.dart';
 import 'package:on_the_go/core/models/tour_model.dart';
+import 'package:on_the_go/core/widgets/youtube_section.dart';
 import 'package:on_the_go/features/discover/presentation/manager/booking_cubit/booking_cubit.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
-import 'package:on_the_go/features/place_details/presentation/views/widgets/youtube_section.dart';
 
 class PlaceDetailsViewBody extends StatefulWidget {
   const PlaceDetailsViewBody({super.key, required this.tourModel});
@@ -480,48 +480,48 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             const SizedBox(height: 20),
             _buildIncludedSection(),
             const SizedBox(height: 20),
-            // Container(
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(12),
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.grey.withOpacity(0.2),
-            //         blurRadius: 10,
-            //         offset: const Offset(0, 4),
-            //       ),
-            //     ],
-            //   ),
-            //   child: ClipRRect(
-            //     borderRadius: BorderRadius.circular(12),
-            //     child: LayoutBuilder(
-            //       builder: (context, constraints) {
-            //         final isMobile = constraints.maxWidth < 600;
-            //         final isTablet = constraints.maxWidth < 900;
-            //         final videoHeight =
-            //             isMobile
-            //                 ? 200.0
-            //                 : isTablet
-            //                 ? 300.0
-            //                 : 400.0;
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.maxWidth < 600;
+                    final isTablet = constraints.maxWidth < 900;
+                    final videoHeight =
+                        isMobile
+                            ? 200.0
+                            : isTablet
+                            ? 300.0
+                            : 400.0;
 
-            //         return ConstrainedBox(
-            //           constraints: BoxConstraints(
-            //             maxHeight: videoHeight,
-            //             maxWidth: constraints.maxWidth,
-            //           ),
-            //           child:
-            //               widget.tourModel.youtubeVideoUrl != null
-            //                   ? YoutubeVideoWidget(
-            //                     videoId: extractYoutubeVideoId(
-            //                       widget.tourModel.youtubeVideoUrl!,
-            //                     ),
-            //                   )
-            //                   : const SizedBox(),
-            //         );
-            //       },
-            //     ),
-            //   ),
-            // ),
+                    return ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: videoHeight,
+                        maxWidth: constraints.maxWidth,
+                      ),
+                      child:
+                          widget.tourModel.youtubeVideoUrl != null
+                              ? YoutubeVideoWidget(
+                                videoId: extractYoutubeVideoId(
+                                  widget.tourModel.youtubeVideoUrl!,
+                                ),
+                              )
+                              : const SizedBox(),
+                    );
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),

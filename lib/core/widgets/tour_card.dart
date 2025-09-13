@@ -43,7 +43,7 @@ class _TourCardState extends State<TourCard>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.go(PlaceDetailsView.routeName, extra: widget.tourModel);
+        context.go("${PlaceDetailsView.routeName}/${widget.tourModel.id}");
       },
       child: MouseRegion(
         onEnter: (_) => setState(() => isHover = true),

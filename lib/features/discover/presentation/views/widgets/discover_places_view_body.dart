@@ -66,7 +66,7 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
             children: [
               // Header Section
               Container(
-                height: 300,
+                height: 320,
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
@@ -151,7 +151,9 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
                                           CrossAxisAlignment.start,
                                       children: [
                                         AutoSizeText(
+                                          maxLines: 1,
                                           maxFontSize: 38,
+
                                           minFontSize: 12,
                                           widget.governMentName,
                                           style: const TextStyle(
@@ -169,7 +171,8 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
                                             )
                                             : Text(""),
                                         const SizedBox(height: 12),
-                                        Text(
+                                        AutoSizeText(
+                                          maxLines: 1,
                                           'Explore breathtaking ${widget.governMentName.toLowerCase()} destinations',
                                           style: const TextStyle(
                                             fontSize: 16,

@@ -88,12 +88,15 @@ class HoverMenuDestinationButtonState extends State<HoverMenuDestinationButton>
       hoverColor: const Color.fromARGB(255, 3, 41, 106),
       borderRadius: BorderRadius.circular(8),
       onTap: () {
-        context.go(
-          DiscoverPlacesView.routeName,
-          extra: {'governmentName': text},
-        );
+        final base = '${DiscoverPlacesView.routeName}/$text';
+        final type = null; // لو عندك type ضيفه هنا، لو مش موجود سيبها null
+
+        final path = type != null ? '$base?type=$type' : base;
+
+        context.go(path);
         _hideMenu();
       },
+
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Text(text, style: TextStyle(color: Colors.white)),

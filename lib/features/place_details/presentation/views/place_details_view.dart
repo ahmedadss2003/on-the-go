@@ -17,7 +17,11 @@ class PlaceDetailsView extends StatelessWidget {
           (context) => BookingCubit(
             FirestoreServices(firestore: FirebaseFirestore.instance),
           ),
-      child: PlaceDetailsViewBody(tourModel: tourModel),
+      child: SelectableRegion(
+        focusNode: FocusNode(),
+        selectionControls: MaterialTextSelectionControls(),
+        child: PlaceDetailsViewBody(tourModel: tourModel),
+      ),
     );
   }
 }

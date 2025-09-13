@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:on_the_go/core/widgets/up_arrow.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/custom_drawer.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/custom_home_appbar.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/home_content.dart';
@@ -22,7 +23,16 @@ class _HomeViewBodyState extends State<HomeViewBody> {
         child: CustomAppBar(footerKey: _footerKey),
       ),
       endDrawer: width < 800 ? CustomDrawer(footerKey: _footerKey) : null,
-      body: HomeContent(footerKey: _footerKey),
+      body: Stack(
+        children: [
+          SelectableRegion(
+            focusNode: FocusNode(),
+            selectionControls: MaterialTextSelectionControls(),
+            child: HomeContent(footerKey: _footerKey),
+          ),
+          const UpArrow(),
+        ],
+      ),
     );
   }
 }

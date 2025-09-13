@@ -449,10 +449,10 @@ class SearchButton extends StatelessWidget {
           );
           return;
         }
-        context.go(
-          DiscoverPlacesView.routeName,
-          extra: {'governmentName': governmentName, 'type': type},
-        );
+        final base = '${DiscoverPlacesView.routeName}/$governmentName';
+        final path = type != null ? '$base?type=$type' : base;
+
+        context.go(path);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange,

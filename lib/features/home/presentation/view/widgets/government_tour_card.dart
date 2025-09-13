@@ -20,11 +20,15 @@ class _GovernmentFilterTourCardState extends State<GovernmentFilterTourCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.go(
-          DiscoverPlacesView.routeName,
-          extra: {"governmentName": widget.governmentModel.name},
-        );
+        final base =
+            '${DiscoverPlacesView.routeName}/${widget.governmentModel.name}';
+        final type = null;
+
+        final path = type != null ? '$base?type=$type' : base;
+
+        context.go(path);
       },
+
       child: MouseRegion(
         onEnter: (_) => setState(() => isHover = true),
         onExit: (_) => setState(() => isHover = false),

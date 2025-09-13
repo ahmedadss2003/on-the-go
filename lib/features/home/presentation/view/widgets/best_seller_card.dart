@@ -37,7 +37,9 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
       },
       child: GestureDetector(
         onTap: () {
-          context.go(PlaceDetailsView.routeName, extra: widget.tour);
+          context.go(
+            "${PlaceDetailsView.routeName}/${widget.tour.id}", // 👈 بتمرر id بس
+          );
         },
         child: Container(
           width: 280,

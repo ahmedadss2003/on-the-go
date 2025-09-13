@@ -12,6 +12,10 @@ class DiscoverPlacesView extends StatelessWidget {
   final String? type;
   @override
   Widget build(BuildContext context) {
-    return DiscoverPlacesViewBody(governMentName: governmentName, type: type);
+    return SelectableRegion(
+      focusNode: FocusNode(),
+      selectionControls: MaterialTextSelectionControls(),
+      child: DiscoverPlacesViewBody(governMentName: governmentName, type: type),
+    );
   }
 }

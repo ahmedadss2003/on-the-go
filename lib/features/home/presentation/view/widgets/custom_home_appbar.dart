@@ -47,7 +47,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   HoverMenuDestinationButton(),
                   SizedBox(width: 30),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.only(bottom: 18),
 
                     child: CustomAppBarButton(
                       onPressed: () {
@@ -58,7 +58,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   SizedBox(width: 30),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.only(bottom: 18),
                     child: CustomAppBarButton(
                       onPressed: () {
                         _scrollToFooter(context);

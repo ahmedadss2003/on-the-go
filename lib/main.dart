@@ -3,34 +3,28 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:on_the_go/core/app_router/app_router.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:on_the_go/core/services/service_locator.dart';
-import 'package:on_the_go/core/utils/dummy_utils.dart';
-import 'package:on_the_go/core/widgets/up_arrow.dart';
 import 'package:on_the_go/core/widgets/whatsApp_floating_button%20.dart';
 import 'package:on_the_go/features/home/presentation/manager/tour_cubit/tour_cubit_cubit.dart';
-
-// استيراد مشروط
-import 'core/utils/web_utils.dart'
-    if (dart.library.io) 'core/utils/dummy_utils.dart';
-
 import 'firebase_options.dart';
+import 'dart:html' as html;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupServiceLocator();
-
-  // هنا هتشتغل بس لو Web
+  setUrlStrategy(PathUrlStrategy());
   if (kIsWeb) {
-    setupWebStuff();
+    html.window.addEventListener('beforeunload', (event) {
+      html.window.location.href = '/';
+    });
   }
-
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -49,9 +43,8 @@ class MyApp extends StatelessWidget {
           return Scaffold(
             body: Stack(
               children: [
-                child ?? const SizedBox.shrink(),
+                child ?? SizedBox.shrink(),
                 const WhatsAppFloatingButton(),
-                UpArrow(),
               ],
             ),
           );
