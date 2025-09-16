@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
+import 'package:on_the_go/features/home/presentation/manager/get_categories/get_categories_cubit.dart';
 
 class FilterSection extends StatefulWidget {
   const FilterSection({super.key});
@@ -14,6 +16,12 @@ class _FilterSectionState extends State<FilterSection> {
   String? selectedType;
 
   @override
+  void initState() {
+    super.initState();
+    context.read<GetCategoryCubit>().getCategories();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -21,10 +29,9 @@ class _FilterSectionState extends State<FilterSection> {
         final isMobile = screenWidth < 600;
         final isTablet = screenWidth < 1000;
 
-        // More responsive width calculation
         double containerWidth;
         if (isMobile) {
-          containerWidth = screenWidth - 32; // Account for screen padding
+          containerWidth = screenWidth - 32;
         } else if (isTablet) {
           containerWidth = screenWidth * 0.85;
         } else {
@@ -34,21 +41,22 @@ class _FilterSectionState extends State<FilterSection> {
         return Container(
           constraints: BoxConstraints(
             maxWidth: containerWidth,
-            minHeight: isMobile ? 70 : 90,
+            minHeight: isMobile ? 160 : 90, // Increased height for mobile
           ),
           width: containerWidth,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(isMobile ? 25 : 33),
+            borderRadius: BorderRadius.circular(isMobile ? 20 : 33),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                blurRadius: 10,
+                color: Colors.grey.withOpacity(0.15),
+                blurRadius: 15,
+                spreadRadius: 2,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          padding: EdgeInsets.all(isMobile ? 8 : 12),
+          padding: EdgeInsets.all(isMobile ? 16 : 12),
           child: isMobile ? _buildMobileLayout() : _buildDesktopLayout(),
         );
       },
@@ -56,36 +64,48 @@ class _FilterSectionState extends State<FilterSection> {
   }
 
   Widget _buildMobileLayout() {
-    return IntrinsicHeight(
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: WhereToButton(
-              selectedGovernment: selectedGovernment,
-              onGovernmentSelected: (government) {
-                setState(() {
-                  selectedGovernment = government;
-                });
-              },
-            ),
+    return Column(
+      children: [
+        // First row: Where to button (full width)
+        SizedBox(
+          height: 80,
+          width: double.infinity,
+          child: WhereToButton(
+            selectedGovernment: selectedGovernment,
+            onGovernmentSelected: (government) {
+              setState(() {
+                selectedGovernment = government;
+              });
+            },
           ),
-          const SizedBox(width: 4),
-          Expanded(
-            flex: 3,
-            child: TypeButton(
-              selectedType: selectedType,
-              onTypeSelected: (type) {
-                setState(() {
-                  selectedType = type;
-                });
-              },
-            ),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Second row: Type button (full width)
+        SizedBox(
+          height: 80,
+          width: double.infinity,
+          child: TypeButton(
+            selectedType: selectedType,
+            onTypeSelected: (type) {
+              setState(() {
+                selectedType = type;
+              });
+            },
           ),
-          const SizedBox(width: 4),
-          SearchButton(governmentName: selectedGovernment, type: selectedType),
-        ],
-      ),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Third row: Search button (centered)
+        Center(
+          child: SearchButton(
+            governmentName: selectedGovernment,
+            type: selectedType,
+          ),
+        ),
+      ],
     );
   }
 
@@ -135,24 +155,54 @@ class TypeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilterButton(
-      icon: Icons.category_rounded,
-      label: 'Type',
-      hint: selectedType ?? 'Select type',
-      onTap: () {
-        _showTypeMenu(context);
+    return BlocBuilder<GetCategoryCubit, GetCategoryState>(
+      builder: (context, state) {
+        List<Map<String, dynamic>> categories = [];
+        if (state is GetCategorySuccess) {
+          categories =
+              state.categories
+                  .map(
+                    (category) => {
+                      'name': category.name,
+                      'icon': _getCategoryIcon(category.name),
+                    },
+                  )
+                  .toList();
+        } else if (state is GetCategoryLoading) {
+          return FilterButton(
+            icon: Icons.category_rounded,
+            label: 'Type',
+            hint: 'Loading types...',
+            onTap: () {},
+          );
+        } else if (state is GetCategoryError) {
+          return FilterButton(
+            icon: Icons.error,
+            label: 'Type',
+            hint: 'Error loading types',
+            onTap: () {
+              context.read<GetCategoryCubit>().getCategories();
+            },
+          );
+        }
+
+        return FilterButton(
+          icon: Icons.category_rounded,
+          label: 'Type',
+          hint: selectedType ?? 'Select type',
+          onTap: () {
+            _showTypeMenu(context, categories);
+          },
+        );
       },
     );
   }
 
-  void _showTypeMenu(BuildContext context) {
+  void _showTypeMenu(
+    BuildContext context,
+    List<Map<String, dynamic>> categories,
+  ) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    final types = [
-      {'name': 'Red Sea Tours', 'icon': Icons.water_rounded},
-      {'name': 'Historical Tours', 'icon': Icons.history_edu_rounded},
-      {'name': 'Family & fun Tours', 'icon': Icons.family_restroom_rounded},
-      {'name': 'Sharm Desert Tours', 'icon': Icons.terrain_rounded},
-    ];
 
     if (isMobile) {
       showModalBottomSheet(
@@ -164,7 +214,7 @@ class TypeButton extends StatelessWidget {
         isScrollControlled: true,
         builder:
             (context) => _CustomMenu(
-              items: types,
+              items: categories,
               selectedItem: selectedType,
               onItemSelected: onTypeSelected,
               title: 'Select Tour Type',
@@ -180,13 +230,28 @@ class TypeButton extends StatelessWidget {
               ),
               backgroundColor: Colors.white,
               child: _CustomMenu(
-                items: types,
+                items: categories,
                 selectedItem: selectedType,
                 onItemSelected: onTypeSelected,
                 title: 'Select Tour Type',
               ),
             ),
       );
+    }
+  }
+
+  IconData _getCategoryIcon(String categoryName) {
+    switch (categoryName) {
+      case 'Red Sea Tours':
+        return Icons.water_rounded;
+      case 'Historical Tours':
+        return Icons.history_edu_rounded;
+      case 'Family & fun Tours':
+        return Icons.family_restroom_rounded;
+      case 'Sharm Desert Tours':
+        return Icons.terrain_rounded;
+      default:
+        return Icons.category_rounded;
     }
   }
 }
@@ -441,33 +506,58 @@ class SearchButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
-    return ElevatedButton(
-      onPressed: () {
-        if (governmentName == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please select a destination')),
-          );
-          return;
-        }
-        final base = '${DiscoverPlacesView.routeName}/$governmentName';
-        final path = type != null ? '$base?type=$type' : base;
 
-        context.go(path);
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.orange,
-        elevation: 6,
-        shadowColor: Colors.orange.withOpacity(0.4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(isMobile ? 15 : 20),
+    return Container(
+      width: isMobile ? 200 : null, // Fixed width for mobile
+      child: ElevatedButton(
+        onPressed: () {
+          if (governmentName == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please select a destination'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            return;
+          }
+          final base = '${DiscoverPlacesView.routeName}/$governmentName';
+          final path = type != null ? '$base?type=$type' : base;
+          context.go(path);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange,
+          elevation: 8,
+          shadowColor: Colors.orange.withOpacity(0.4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(isMobile ? 25 : 20),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 24 : 20,
+            vertical: isMobile ? 16 : 14,
+          ),
         ),
-        padding: EdgeInsets.all(isMobile ? 8 : 14),
-        minimumSize: Size(isMobile ? 40 : 60, isMobile ? 40 : 50),
-      ),
-      child: Icon(
-        Icons.search_rounded,
-        color: Colors.white,
-        size: isMobile ? 18 : 24,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_rounded,
+              color: Colors.white,
+              size: isMobile ? 20 : 24,
+            ),
+            if (isMobile) ...[
+              const SizedBox(width: 8),
+              Text(
+                'Search',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -501,12 +591,12 @@ class _FilterButtonState extends State<FilterButton>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 1.03,
+      end: 1.02,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
@@ -520,7 +610,6 @@ class _FilterButtonState extends State<FilterButton>
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
-    final isVerySmall = screenWidth < 360;
 
     return MouseRegion(
       onEnter:
@@ -539,19 +628,21 @@ class _FilterButtonState extends State<FilterButton>
           scale: _scaleAnimation,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
+            width: double.infinity, // Full width for mobile
+            height: isMobile ? 60 : null, // Fixed height for mobile
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors:
                     _isHovered
                         ? [
-                          Colors.orange.withOpacity(0.15),
-                          Colors.orange.withOpacity(0.3),
+                          Colors.orange.withOpacity(0.1),
+                          Colors.orange.withOpacity(0.2),
                         ]
-                        : [Colors.white, Colors.grey[100]!],
+                        : [Colors.white, Colors.grey[50]!],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(isMobile ? 15 : 20),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: _isHovered ? Colors.orange.shade300 : Colors.grey[300]!,
                 width: 1.5,
@@ -560,25 +651,25 @@ class _FilterButtonState extends State<FilterButton>
                   _isHovered
                       ? [
                         BoxShadow(
-                          color: Colors.orange.withOpacity(0.25),
+                          color: Colors.orange.withOpacity(0.2),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ]
                       : [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: Colors.grey.withOpacity(0.08),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
                       ],
             ),
             padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 6 : 12,
-              vertical: isMobile ? 6 : 10,
+              horizontal: isMobile ? 16 : 12,
+              vertical: isMobile ? 12 : 10,
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(
                   widget.icon,
@@ -586,13 +677,13 @@ class _FilterButtonState extends State<FilterButton>
                       _isHovered
                           ? Colors.orange.shade700
                           : Colors.blue.shade600,
-                  size: isMobile ? 18 : 24,
+                  size: isMobile ? 24 : 20,
                 ),
-                SizedBox(width: isMobile ? 4 : 8),
+                SizedBox(width: isMobile ? 16 : 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         widget.label,
@@ -601,28 +692,31 @@ class _FilterButtonState extends State<FilterButton>
                               _isHovered
                                   ? Colors.orange.shade700
                                   : Colors.blue.shade600,
-                          fontSize: isVerySmall ? 10 : (isMobile ? 11 : 14),
+                          fontSize: isMobile ? 16 : 14,
                           fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.hint,
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: isMobile ? 14 : 12,
+                          fontWeight: FontWeight.w400,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
-                      if (!isVerySmall) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          widget.hint,
-                          style: TextStyle(
-                            color: Colors.grey[700],
-                            fontSize: isMobile ? 9 : 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      ],
                     ],
                   ),
                 ),
+                if (isMobile)
+                  Icon(
+                    Icons.arrow_drop_down_rounded,
+                    color:
+                        _isHovered ? Colors.orange.shade700 : Colors.grey[500],
+                    size: 24,
+                  ),
               ],
             ),
           ),

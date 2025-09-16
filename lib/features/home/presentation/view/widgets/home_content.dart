@@ -6,8 +6,11 @@ import 'package:on_the_go/features/home/presentation/view/widgets/How_Book_with_
 import 'package:on_the_go/features/home/presentation/view/widgets/best_seller_trip_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/bg_container.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/footer_section.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/get_fav_trip_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/how_pay_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/most_popular_destination.dart';
+import 'package:on_the_go/features/home/presentation/view/widgets/photos_setion.dart';
+
 import 'package:on_the_go/features/home/presentation/view/widgets/review_section.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/slide_fade_animation.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/time_descover_widget.dart';
@@ -16,7 +19,19 @@ import 'offer_container_section.dart';
 
 class HomeContent extends StatelessWidget {
   final GlobalKey footerKey;
-  const HomeContent({super.key, required this.footerKey});
+  final GlobalKey howBookKey;
+  final GlobalKey offersKey;
+  final GlobalKey aboutKey;
+  final GlobalKey favKey;
+
+  const HomeContent({
+    super.key,
+    required this.footerKey,
+    required this.howBookKey,
+    required this.offersKey,
+    required this.aboutKey,
+    required this.favKey,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +46,11 @@ class HomeContent extends StatelessWidget {
               BackgroundContainer(
                 child: Column(
                   children: [
-                    const OfferContainerSection(),
+                    // Offers Section with Key
+                    Container(
+                      key: offersKey,
+                      child: const OfferContainerSection(),
+                    ),
                     const SizedBox(height: 100),
                     Container(
                       decoration: BoxDecoration(
@@ -75,23 +94,28 @@ class HomeContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // About Section (TimeToDiscoverContainer could represent about)
                     TimeToDiscoverContainer(),
                     const SizedBox(height: 20),
                     MostPopularDestinationsContainer(),
                     const SizedBox(height: 20),
-                    BestSellerTripsSection(),
+                    Container(key: offersKey, child: BestSellerTripsSection()),
+                    const SizedBox(height: 50),
+                    Container(key: favKey, child: FavouriteTripsSection()),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
               HowPaySection(width: width),
-
               const SizedBox(height: 20),
               ReviewsSection(width: width),
               const SizedBox(height: 20),
-              HowBookSection(width: width),
+              // How Book Section with Key
+              Container(key: howBookKey, child: HowBookSection(width: width)),
+              const SizedBox(height: 20),
+              PhotoDisplaySection(imageUrls: imagesList),
               const SizedBox(height: 50),
-              FooterSection(key: footerKey),
+              FooterSection(key: aboutKey),
             ],
           ),
         );

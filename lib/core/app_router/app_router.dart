@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
+import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
 import 'package:on_the_go/features/home/presentation/view/home_view.dart';
 import 'package:on_the_go/features/place_details/presentation/views/place_details_view.dart';
 import 'package:on_the_go/features/place_details/presentation/views/place_details_wraper.dart';
+import 'package:on_the_go/features/transportation/presentation/transporation_Booking_view.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: HomeView.routeName,
@@ -14,9 +16,15 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '${DiscoverPlacesView.routeName}/:governmentName',
       builder: (context, state) {
+        final TourModel tourModel = state.extra as TourModel;
+
         final governmentName = state.pathParameters['governmentName']!;
         final type = state.uri.queryParameters['type']; // optional
-        return DiscoverPlacesView(governmentName: governmentName, type: type);
+        return DiscoverPlacesView(
+          governmentName: governmentName,
+          type: type,
+          tourModel: tourModel,
+        );
       },
     ),
 
@@ -26,6 +34,10 @@ final GoRouter router = GoRouter(
         final id = state.pathParameters['id']!;
         return PlaceDetailsWrapper(id: id);
       },
+    ),
+    GoRoute(
+      path: TransporationBookingView.routeName,
+      builder: (context, state) => const TransporationBookingView(),
     ),
   ],
 );

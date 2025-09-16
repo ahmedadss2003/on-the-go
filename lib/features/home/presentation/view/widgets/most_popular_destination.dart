@@ -140,9 +140,9 @@ class MostPopularDestinationsContainer extends StatelessWidget {
 
   double _getChildAspectRatio(double width) {
     if (width > 1322) return 0.7;
-
+    if (width > 450 && width < 550) return 1;
+    if (width > 340 && width < 450) return 1;
     if (width > 994) return 0.62;
-
     if (width < 870) return 0.67;
     if (width <= 290) return 0.56;
 

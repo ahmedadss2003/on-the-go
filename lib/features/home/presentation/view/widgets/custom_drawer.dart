@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
+import 'package:on_the_go/features/transportation/presentation/transporation_Booking_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({super.key, required this.footerKey});
+  const CustomDrawer({
+    super.key,
+    required this.footerKey,
+    required this.howBookKey,
+    required this.offersKey,
+    required this.aboutKey,
+    required this.favKey,
+  });
+
   final GlobalKey footerKey;
-
-  void _scrollToFooter(BuildContext context) {
-    Scrollable.ensureVisible(
-      footerKey.currentContext!,
-      alignment: 0.0,
-      duration: const Duration(milliseconds: 700),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  void _scrollToHowBooking(BuildContext context) {
-    Scrollable.ensureVisible(
-      footerKey.currentContext!,
-      alignment: -8.0,
-      duration: const Duration(milliseconds: 700),
-      curve: Curves.easeInOut,
-    );
+  final GlobalKey howBookKey;
+  final GlobalKey offersKey;
+  final GlobalKey aboutKey;
+  final GlobalKey favKey;
+  void _scrollToSection(BuildContext context, GlobalKey sectionKey) {
+    if (sectionKey.currentContext != null) {
+      Scrollable.ensureVisible(
+        sectionKey.currentContext!,
+        alignment: 0.0, // Always start from top of the section
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   @override
@@ -35,7 +41,7 @@ class CustomDrawer extends StatelessWidget {
             DrawerHeader(
               decoration: const BoxDecoration(color: Color(0xFF052C6A)),
               child: Center(
-                child: Image.asset("assets/images/logo.png", width: 120),
+                child: Image.asset("assets/images/logo2.png", width: 120),
               ),
             ),
             Row(
@@ -48,17 +54,28 @@ class CustomDrawer extends StatelessWidget {
             ),
             SizedBox(height: 6),
             _buildDrawerItem(context, Icons.info_outline, "About Us", () {
-              _scrollToFooter(context);
+              _scrollToSection(context, aboutKey);
               Navigator.pop(context);
             }),
-            _buildDrawerItem(context, Icons.room_service, "How Book", () {
-              _scrollToHowBooking(context);
+            _buildDrawerItem(context, Icons.local_offer, "Offers", () {
+              _scrollToSection(context, offersKey);
               Navigator.pop(context);
-              // Add Services navigation
             }),
+            _buildDrawerItem(context, Icons.room_service, "Favorites", () {
+              _scrollToSection(context, favKey);
+              Navigator.pop(context);
+            }),
+            _buildDrawerItem(context, Icons.room_service, "How to Book", () {
+              _scrollToSection(context, howBookKey);
+              Navigator.pop(context);
+            }),
+
             _buildDrawerItem(context, Icons.contact_mail, "Contact", () {
               _launchWhatsApp();
-
+              Navigator.pop(context);
+            }),
+            _buildDrawerItem(context, Icons.contact_mail, "Transportation", () {
+              context.go(TransporationBookingView.routeName);
               Navigator.pop(context);
             }),
           ],

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
@@ -17,6 +18,13 @@ class HoverMenuDestinationButtonState extends State<HoverMenuDestinationButton>
   bool _isMenuOpen = false;
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
+
+  // Check if we're on a touch device (mobile/tablet)
+  bool get _isTouchDevice =>
+      !kIsWeb ||
+      (kIsWeb &&
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.android));
 
   @override
   void initState() {
@@ -43,40 +51,61 @@ class HoverMenuDestinationButtonState extends State<HoverMenuDestinationButton>
   void _hideMenu() {
     if (!_isMenuOpen) return;
 
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-    _isMenuOpen = false;
+    _controller.reverse().then((_) {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+      _isMenuOpen = false;
+    });
+  }
+
+  void _toggleMenu(BuildContext context) {
+    if (_isMenuOpen) {
+      _hideMenu();
+    } else {
+      _showMenu(context);
+    }
   }
 
   OverlayEntry _createOverlayEntry(BuildContext context) {
     return OverlayEntry(
       builder: (context) {
-        return Positioned(
-          width: 200,
-          child: CompositedTransformFollower(
-            link: _layerLink,
-            offset: Offset(-40, 40),
-            showWhenUnlinked: false,
-            child: MouseRegion(
-              onExit: (_) => _hideMenu(),
-              child: SlideTransition(
-                position: _offsetAnimation,
-                child: Material(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Color.fromRGBO(8, 64, 154, 0.8),
-                  elevation: 4,
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    children: [
-                      _menuItem("Sharm El Sheikh Tours"),
-                      _menuItem("Cairo Tours"),
-                      _menuItem("Luxor Tours"),
-                    ],
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: _isTouchDevice ? _hideMenu : null,
+          child: Stack(
+            children: [
+              Positioned(
+                width: 200,
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  offset: const Offset(-40, 40),
+                  showWhenUnlinked: false,
+                  child: GestureDetector(
+                    onTap: () {}, // Prevent tap from bubbling up
+                    child: MouseRegion(
+                      onExit: _isTouchDevice ? null : (_) => _hideMenu(),
+                      child: SlideTransition(
+                        position: _offsetAnimation,
+                        child: Material(
+                          borderRadius: BorderRadius.circular(12),
+                          color: const Color.fromRGBO(8, 64, 154, 0.8),
+                          elevation: 4,
+                          child: ListView(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            children: [
+                              _menuItem("Sharm El Sheikh Tours"),
+                              _menuItem("Cairo Tours"),
+                              _menuItem("Luxor Tours"),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         );
       },
@@ -89,17 +118,16 @@ class HoverMenuDestinationButtonState extends State<HoverMenuDestinationButton>
       borderRadius: BorderRadius.circular(8),
       onTap: () {
         final base = '${DiscoverPlacesView.routeName}/$text';
-        final type = null; // لو عندك type ضيفه هنا، لو مش موجود سيبها null
+        const type = null; // لو عندك type ضيفه هنا، لو مش موجود سيبها null
 
         final path = type != null ? '$base?type=$type' : base;
 
         context.go(path);
         _hideMenu();
       },
-
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Text(text, style: TextStyle(color: Colors.white)),
+        child: Text(text, style: const TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -108,25 +136,48 @@ class HoverMenuDestinationButtonState extends State<HoverMenuDestinationButton>
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
       link: _layerLink,
-      child: MouseRegion(
-        onEnter: (_) => _showMenu(context),
-        child: SizedBox(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Destinations",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w200,
-                  color: Colors.white,
+      child:
+          _isTouchDevice
+              ? GestureDetector(
+                onTap: () => _toggleMenu(context),
+                child: _buildButtonContent(),
+              )
+              : MouseRegion(
+                onEnter: (_) => _showMenu(context),
+                child: GestureDetector(
+                  onTap: () => _toggleMenu(context),
+                  child: _buildButtonContent(),
                 ),
               ),
-              Icon(Icons.arrow_drop_down, color: Colors.white),
-            ],
+    );
+  }
+
+  Widget _buildButtonContent() {
+    return SizedBox(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            "Destinations",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w200,
+              color: Colors.white,
+            ),
           ),
-        ),
+          Icon(
+            _isMenuOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+            color: Colors.white,
+          ),
+        ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _hideMenu();
+    super.dispose();
   }
 }

@@ -5,6 +5,7 @@ import 'package:on_the_go/features/home/data/repos/tour_repo_impl.dart';
 import 'package:on_the_go/features/home/domain/repos/tour_repo.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_Best_seller_tours_usecase.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_all_tours_usecase.dart';
+import 'package:on_the_go/features/home/domain/use_cases/get_favourites_tours_usecases.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_tours_by_category_usecase.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_tours_by_category_and_governorate_usecase.dart';
 import 'package:on_the_go/features/home/presentation/manager/tour_cubit/tour_cubit_cubit.dart';
@@ -23,6 +24,7 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton(() => GetAllToursUseCase(sl()));
   sl.registerLazySingleton(() => GetBestSellerToursUseCase(sl()));
   sl.registerLazySingleton(() => GetToursByCategoryUseCase(sl()));
+  sl.registerLazySingleton(() => GetFavouritesToursUseCase(sl()));
   sl.registerLazySingleton(() => GetToursByCategoryAndGovernorateUseCase(sl()));
 
   // Cubit
@@ -32,6 +34,7 @@ Future<void> setupServiceLocator() async {
       sl<GetBestSellerToursUseCase>(),
       sl<GetToursByCategoryUseCase>(),
       sl<GetToursByCategoryAndGovernorateUseCase>(),
+      sl<GetFavouritesToursUseCase>(),
     ),
   );
 }

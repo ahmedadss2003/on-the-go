@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/footer_section.dart';
 
@@ -7,11 +8,13 @@ class DiscoverPlacesViewBody extends StatefulWidget {
   const DiscoverPlacesViewBody({
     super.key,
     required this.governMentName,
+
     this.type,
+    required this.tourModel,
   });
   final String governMentName;
   final String? type;
-
+  final TourModel tourModel;
   @override
   State<DiscoverPlacesViewBody> createState() => _DiscoverPlacesViewBodyState();
 }
@@ -295,6 +298,7 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
                       Padding(
                         padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                         child: CustomDiscoverPlacesByCategoryGridView(
+                          currentTour: widget.tourModel,
                           governMentName: widget.governMentName,
                           type: widget.type,
                         ),

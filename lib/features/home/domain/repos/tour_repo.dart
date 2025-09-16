@@ -8,4 +8,5 @@ abstract class TourRepo {
     String governorateName,
   );
   Future<List<TourModel>> getBestSellerTours();
+  Future<List<TourModel>> getFavouriteTours();
 }

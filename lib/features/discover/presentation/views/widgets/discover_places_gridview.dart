@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/core/widgets/tour_card.dart';
 import 'package:on_the_go/features/home/presentation/manager/tour_cubit/tour_cubit_cubit.dart';
 
@@ -8,9 +9,11 @@ class CustomDiscoverPlacesByCategoryGridView extends StatefulWidget {
     super.key,
     required this.governMentName,
     this.type,
+    required this.currentTour,
   });
   final String governMentName;
   final String? type;
+  final TourModel currentTour;
 
   @override
   State<CustomDiscoverPlacesByCategoryGridView> createState() =>
@@ -42,7 +45,10 @@ class _CustomDiscoverPlacesByCategoryGridViewState
             if (state is TourCubitLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is TourCubitSuccess) {
-              final tours = state.tours;
+              final tours =
+                  state.tours
+                      .where((tour) => tour.id != widget.currentTour?.id)
+                      .toList();
               return LayoutBuilder(
                 builder: (context, constraints) {
                   final crossAxisCount = _getCrossAxisCount(

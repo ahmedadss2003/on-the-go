@@ -169,12 +169,16 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                widget.tour.title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF666666),
+              Expanded(
+                child: AutoSizeText(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  widget.tour.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF666666),
+                  ),
                 ),
               ),
             ],

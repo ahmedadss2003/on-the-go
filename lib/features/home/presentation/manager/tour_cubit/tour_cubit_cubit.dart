@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_Best_seller_tours_usecase.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_all_tours_usecase.dart';
+import 'package:on_the_go/features/home/domain/use_cases/get_favourites_tours_usecases.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_tours_by_category_and_governorate_usecase.dart';
 import 'package:on_the_go/features/home/domain/use_cases/get_tours_by_category_usecase.dart';
 
@@ -14,17 +15,20 @@ class TourCubitCubit extends Cubit<TourCubitState> {
     this.getBestSellerToursUseCase,
     this.getToursByCategoryUseCase,
     this.getToursByCategoryAndGovernorateUseCase,
+    this.getFavouritesToursUseCase,
   ) : super(TourCubitInitial());
 
   final GetAllToursUseCase getAllToursUseCase;
   final GetBestSellerToursUseCase getBestSellerToursUseCase;
   final GetToursByCategoryUseCase getToursByCategoryUseCase;
+  final GetFavouritesToursUseCase getFavouritesToursUseCase;
   final GetToursByCategoryAndGovernorateUseCase
   getToursByCategoryAndGovernorateUseCase;
 
   // Cache variables
   List<TourModel>? _allToursCache;
   List<TourModel>? _bestSellerToursCache;
+  List<TourModel>? _favouritesToursCache;
   final Map<String, List<TourModel>> _categoryCache = {};
   final Map<String, List<TourModel>> _categoryGovernorateCache = {};
 

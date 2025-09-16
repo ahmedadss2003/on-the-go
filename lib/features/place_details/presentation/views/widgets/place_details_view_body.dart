@@ -48,6 +48,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   late AnimationController _animController;
   late Animation<double> _fadeAnimation;
   late ScrollController _scrollController;
+  int _currentImageIndex = 0;
 
   @override
   void initState() {
@@ -107,7 +108,6 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
 
     setState(() => _isBookingInProgress = true);
 
-    // Calculate total price (same as in _buildBookingForm)
     final discountAmount =
         widget.tourModel.priceAdult * (widget.tourModel.discount / 100);
     final price = (widget.tourModel.priceAdult - discountAmount).round();
@@ -123,7 +123,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       'departure_date': selectedDate!.toIso8601String().split('T')[0],
       'tour_name': widget.tourModel.title,
       'total_price': totalPrice,
-      'is_read': false, // Include is_read for consistency with dashboard
+      'is_read': false,
     };
     context.read<BookingCubit>().bookTour(bookingData);
   }
@@ -155,131 +155,205 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   }
 
   void _showImageGallery() {
-    int currentPage = 0;
-    final pageController = PageController();
+    int currentPage = _currentImageIndex;
+    final pageController = PageController(initialPage: currentPage);
     final images = widget.tourModel.images.map((e) => e.url).toList();
+
+    // Handle empty image list
+    if (images.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No images available')));
+      return;
+    }
 
     showDialog(
       context: context,
-      builder:
-          (context) => Dialog(
-            child: StatefulBuilder(
-              builder:
-                  (context, setState) => SizedBox(
-                    width: 600,
-                    height: 400,
-                    child: Column(
+      barrierDismissible: true,
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        double dialogWidth;
+        if (screenWidth < 600) {
+          dialogWidth = screenWidth;
+        } else if (screenWidth < 900) {
+          dialogWidth = screenWidth * 0.5;
+        } else {
+          dialogWidth = screenWidth * 0.4;
+        }
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(20),
+          child: Center(
+            child: Container(
+              width: dialogWidth,
+              height: MediaQuery.of(context).size.height * 0.5,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: StatefulBuilder(
+                builder:
+                    (context, setState) => Stack(
                       children: [
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ),
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              PageView.builder(
-                                controller: pageController,
-                                itemCount: images.length,
-                                onPageChanged:
-                                    (index) =>
-                                        setState(() => currentPage = index),
-                                itemBuilder:
-                                    (context, index) => Image.network(
-                                      images[index],
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) =>
-                                              const Icon(
-                                                Icons.error,
-                                                size: 50,
-                                                color: Colors.red,
-                                              ),
+                        // Image PageView
+                        PageView.builder(
+                          controller: pageController,
+                          itemCount: images.length,
+                          onPageChanged:
+                              (index) => setState(() => currentPage = index),
+                          itemBuilder:
+                              (context, index) => Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.network(
+                                        images[index],
+                                        fit:
+                                            BoxFit
+                                                .cover, // Center and fit image
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        loadingBuilder: (
+                                          context,
+                                          child,
+                                          loadingProgress,
+                                        ) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.amber,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Center(
+                                                  child: Icon(
+                                                    Icons.error,
+                                                    color: Colors.red,
+                                                    size: 40,
+                                                  ),
+                                                ),
+                                      ),
                                     ),
+                                  ),
+                                ),
                               ),
-                              if (currentPage > 0)
-                                Positioned(
-                                  left: 10,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: Center(
-                                    child: IconButton(
-                                      onPressed:
-                                          () => pageController.previousPage(
-                                            duration: const Duration(
-                                              milliseconds: 300,
-                                            ),
-                                            curve: Curves.easeInOut,
-                                          ),
-                                      icon: const Icon(
-                                        Icons.arrow_back_ios,
-                                        color: Colors.white,
-                                      ),
-                                      style: IconButton.styleFrom(
-                                        backgroundColor: Colors.black54,
-                                        shape: const CircleBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              if (currentPage < images.length - 1)
-                                Positioned(
-                                  right: 10,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: Center(
-                                    child: IconButton(
-                                      onPressed:
-                                          () => pageController.nextPage(
-                                            duration: const Duration(
-                                              milliseconds: 300,
-                                            ),
-                                            curve: Curves.easeInOut,
-                                          ),
-                                      icon: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: Colors.white,
-                                      ),
-                                      style: IconButton.styleFrom(
-                                        backgroundColor: Colors.black54,
-                                        shape: const CircleBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(16),
+                        // Page Indicators
+                        Positioned(
+                          bottom: 10,
+                          left: 0,
+                          right: 0,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: List.generate(
                               images.length,
-                              (index) => Container(
+                              (i) => Container(
                                 margin: const EdgeInsets.symmetric(
                                   horizontal: 4,
                                 ),
-                                width: currentPage == index ? 12 : 8,
-                                height: currentPage == index ? 12 : 8,
+                                width: currentPage == i ? 10 : 6,
+                                height: currentPage == i ? 10 : 6,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color:
-                                      currentPage == index
-                                          ? Colors.blue
-                                          : Colors.grey,
+                                      currentPage == i
+                                          ? Colors.amber
+                                          : Colors.white70,
                                 ),
                               ),
                             ),
                           ),
                         ),
+                        // Close Button
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 24,
+                              semanticLabel: 'Close gallery',
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.black54,
+                              shape: const CircleBorder(),
+                              padding: const EdgeInsets.all(8),
+                            ),
+                          ),
+                        ),
+                        // Navigation Arrows
+                        if (currentPage > 0)
+                          Positioned(
+                            left: 10,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: IconButton(
+                                onPressed:
+                                    () => pageController.previousPage(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    ),
+                                icon: const Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: Colors.white,
+                                  size: 20,
+                                  semanticLabel: 'Previous image',
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.teal.withOpacity(0.7),
+                                  shape: const CircleBorder(),
+                                  padding: const EdgeInsets.all(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (currentPage < images.length - 1)
+                          Positioned(
+                            right: 10,
+                            top: 0,
+                            bottom: 0,
+                            child: Center(
+                              child: IconButton(
+                                onPressed:
+                                    () => pageController.nextPage(
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    ),
+                                icon: const Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white,
+                                  size: 20,
+                                  semanticLabel: 'Next image',
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.teal.withOpacity(0.7),
+                                  shape: const CircleBorder(),
+                                  padding: const EdgeInsets.all(8),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
-                  ),
+              ),
             ),
           ),
+        );
+      },
     );
   }
 
@@ -314,9 +388,13 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                   _buildMainContent(),
                   const SizedBox(height: 20),
                   const AutoSizeText(
-                    "Similar and Most Popular Tours",
+                    "Explore Similar Tours",
                     maxLines: 1,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -324,6 +402,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                       vertical: 30,
                     ),
                     child: CustomDiscoverPlacesByCategoryGridView(
+                      currentTour: widget.tourModel,
                       governMentName: widget.tourModel.governorate,
                     ),
                   ),
@@ -333,7 +412,9 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             if (_isBookingInProgress)
               Container(
                 color: Colors.black54,
-                child: const Center(child: CircularProgressIndicator()),
+                child: const Center(
+                  child: CircularProgressIndicator(color: Colors.teal),
+                ),
               ),
           ],
         ),
@@ -342,8 +423,9 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   }
 
   Widget _buildHeroSection() {
+    final images = widget.tourModel.images.map((e) => e.url).toList();
     return SizedBox(
-      height: 400,
+      height: 450,
       child: Stack(
         children: [
           GestureDetector(
@@ -352,42 +434,57 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
-                    widget.tourModel.images.isNotEmpty
-                        ? widget.tourModel.images[0].url
-                        : '',
+                    images.isNotEmpty ? images[_currentImageIndex] : '',
                   ),
                   fit: BoxFit.cover,
-                ),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.black26, Colors.black54],
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.3),
+                    BlendMode.darken,
                   ),
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
               ),
             ),
           ),
+
           Positioned(
-            bottom: 70,
+            bottom: 20,
             left: 20,
             right: 20,
             child: FadeTransition(
               opacity: _fadeAnimation,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Column(
                 children: [
-                  _buildHeroStat(
-                    widget.tourModel.rating.toString(),
-                    'Rating',
-                    Icons.star,
+                  Text(
+                    widget.tourModel.title,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  _buildHeroStat(
-                    widget.tourModel.timeOfTour,
-                    'Duration',
-                    Icons.access_time,
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildHeroStat(
+                        widget.tourModel.rating.toString(),
+                        'Rating',
+                        Icons.star_border,
+                        Colors.amber,
+                      ),
+                      const SizedBox(width: 20),
+                      _buildHeroStat(
+                        widget.tourModel.timeOfTour,
+                        'Duration',
+                        Icons.timer,
+                        Colors.teal,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -398,29 +495,41 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     );
   }
 
-  Widget _buildHeroStat(String value, String label, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.cyan[300], size: 16),
-        const SizedBox(width: 4),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+  Widget _buildHeroStat(
+    String value,
+    String label,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
-            ),
-            Text(
-              label,
-              style: TextStyle(color: Colors.grey[300], fontSize: 10),
-            ),
-          ],
-        ),
-      ],
+              Text(
+                label,
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -430,15 +539,15 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
         final isDesktop = constraints.maxWidth >= 900;
 
         return Container(
-          padding: const EdgeInsets.all(30),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
           child:
               isDesktop
                   ? Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(flex: 2, child: _buildTourDetails()),
-                      const SizedBox(width: 40),
-                      Expanded(flex: 1, child: _buildBookingForm()),
+                      Expanded(flex: 3, child: _buildTourDetails()),
+                      const SizedBox(width: 30),
+                      Expanded(flex: 2, child: _buildBookingForm()),
                     ],
                   )
                   : Column(
@@ -456,74 +565,79 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
   Widget _buildTourDetails() {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue.withOpacity(0.1),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTourHeader(),
-            const SizedBox(height: 20),
-            _buildDescription(),
-            const SizedBox(height: 20),
-            _buildTourInfo(),
-            const SizedBox(height: 20),
-            _buildIncludedSection(),
-            const SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isMobile = constraints.maxWidth < 600;
-                    final isTablet = constraints.maxWidth < 900;
-                    final videoHeight =
-                        isMobile
-                            ? 200.0
-                            : isTablet
-                            ? 300.0
-                            : 400.0;
-
-                    return ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: videoHeight,
-                        maxWidth: constraints.maxWidth,
-                      ),
-                      child:
-                          widget.tourModel.youtubeVideoUrl != null
-                              ? YoutubeVideoWidget(
-                                videoId: extractYoutubeVideoId(
-                                  widget.tourModel.youtubeVideoUrl!,
-                                ),
-                              )
-                              : const SizedBox(),
-                    );
-                  },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTourHeader(),
+                const SizedBox(height: 20),
+                _buildDescription(),
+                const SizedBox(height: 20),
+                _buildTourInfo(),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildIncludedSection(),
+          const SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < 600;
+                  final isTablet = constraints.maxWidth < 900;
+                  final videoHeight =
+                      isMobile
+                          ? 220.0
+                          : isTablet
+                          ? 320.0
+                          : 420.0;
+
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: videoHeight,
+                      maxWidth: constraints.maxWidth,
+                    ),
+                    child:
+                        widget.tourModel.youtubeVideoUrl != null
+                            ? YoutubeVideoWidget(
+                              videoId: extractYoutubeVideoId(
+                                widget.tourModel.youtubeVideoUrl!,
+                              ),
+                            )
+                            : const SizedBox(),
+                  );
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -534,21 +648,19 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       children: [
         Text(
           widget.tourModel.title,
-          style: TextStyle(
-            fontSize: 22,
+          style: const TextStyle(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.blue[900],
+            color: Colors.teal,
           ),
         ),
         const SizedBox(height: 15),
         Container(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[50]!, Colors.cyan[50]!],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.blue[100]!),
+            color: Colors.teal[50],
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.teal[100]!),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -557,11 +669,13 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                 Icons.access_time,
                 widget.tourModel.timeOfTour,
                 'Duration',
+                Colors.teal,
               ),
               _buildStatItem(
                 Icons.calendar_month,
                 widget.tourModel.availability,
                 'Available',
+                Colors.teal,
               ),
             ],
           ),
@@ -570,89 +684,69 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     );
   }
 
-  Widget _buildStatItem(IconData icon, String value, String label) {
+  Widget _buildStatItem(
+    IconData icon,
+    String value,
+    String label,
+    Color color,
+  ) {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[600]!, Colors.cyan[500]!],
-            ),
-            borderRadius: BorderRadius.circular(40),
+            color: color,
+            borderRadius: BorderRadius.circular(50),
           ),
-          child: Icon(icon, color: Colors.white, size: 16),
+          child: Icon(icon, color: Colors.white, size: 18),
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 8),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.blue[900],
-            fontSize: 12,
+            color: Colors.black87,
+            fontSize: 14,
           ),
         ),
-        Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 10)),
+        Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
       ],
     );
   }
 
   Widget _buildDescription() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xff1a73e8), width: 1.5),
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 14,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: ExpandedTile(
-              title: Text(
-                'Description',
-                style: TextStyle(
-                  color: Color(0xFF1a73e8),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              content: Text(
-                widget.tourModel.description,
-                style: TextStyle(
-                  fontSize: 18,
-                  height: 1.5,
-                  color: Colors.grey[800],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              controller: ExpandedTileController(),
-              leading: Icon(
-                Icons.description,
-                size: 24,
-                color: Color(0xFF1a73e8),
-              ),
-            ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.teal[100]!),
+      ),
+      child: ExpandedTile(
+        title: const Text(
+          'About This Tour',
+          style: TextStyle(
+            color: Colors.teal,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-      ],
+        content: Text(
+          widget.tourModel.description,
+          style: TextStyle(fontSize: 16, height: 1.6, color: Colors.grey[800]),
+        ),
+        controller: ExpandedTileController(),
+        leading: const Icon(Icons.info_outline, size: 22, color: Colors.teal),
+      ),
     );
   }
 
   Widget _buildTourInfo() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.grey[50]!, Colors.blue[50]!]),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.grey[200]!),
       ),
       child: Column(
@@ -663,44 +757,44 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                 ? 'Around ${formatTimeOfDay(widget.tourModel.departureTime!)}'
                 : 'N/A',
             Icons.schedule,
+            Colors.teal,
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 12),
           _buildInfoRow(
             'Return Time',
             widget.tourModel.returnTime != null
                 ? 'Around ${formatTimeOfDay(widget.tourModel.returnTime!)}'
                 : 'N/A',
             Icons.schedule_send,
+            Colors.teal,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value, IconData icon) {
+  Widget _buildInfoRow(String label, String value, IconData icon, Color color) {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(6),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[600]!, Colors.cyan[500]!],
-            ),
-            borderRadius: BorderRadius.circular(6),
+            color: color,
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: Colors.white, size: 16),
+          child: Icon(icon, color: Colors.white, size: 18),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue[900],
-                  fontSize: 12,
+                  color: Colors.black87,
+                  fontSize: 14,
                 ),
               ),
               Text(
@@ -719,45 +813,52 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 600;
 
-        return isMobile
-            ? Column(
-              children: [
-                _buildIncludedCard(
-                  'Included',
-                  included,
-                  Colors.green,
-                  Icons.check_circle,
-                ),
-                const SizedBox(height: 15),
-                _buildIncludedCard(
-                  'Not Included',
-                  notIncluded,
-                  Colors.red,
-                  Icons.cancel,
-                ),
-              ],
-            )
-            : Row(
-              children: [
-                Expanded(
-                  child: _buildIncludedCard(
-                    'Included',
-                    included,
-                    Colors.green,
-                    Icons.check_circle,
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child:
+              isMobile
+                  ? Column(
+                    children: [
+                      _buildIncludedCard('Included', included, Colors.green),
+                      const SizedBox(height: 12),
+                      _buildIncludedCard(
+                        'Not Included',
+                        notIncluded,
+                        Colors.red,
+                      ),
+                    ],
+                  )
+                  : Row(
+                    children: [
+                      Expanded(
+                        child: _buildIncludedCard(
+                          'Included',
+                          included,
+                          Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildIncludedCard(
+                          'Not Included',
+                          notIncluded,
+                          Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: _buildIncludedCard(
-                    'Not Included',
-                    notIncluded,
-                    Colors.red,
-                    Icons.cancel,
-                  ),
-                ),
-              ],
-            );
+        );
       },
     );
   }
@@ -766,56 +867,66 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     String title,
     List<String> items,
     MaterialColor color,
-    IconData icon,
   ) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color[50],
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color[200]!, width: 1.5),
+        border: Border.all(color: color[200]!, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: color[600], size: 20),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: color[800],
-                ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: color[600],
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(10),
               ),
-            ],
+            ),
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
-          const SizedBox(height: 10),
-          ...items
-              .map(
-                (item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    children: [
-                      Icon(
-                        title == 'Included' ? Icons.check : Icons.close,
-                        color: color[600],
-                        size: 14,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          item,
-                          style: TextStyle(color: color[700], fontSize: 12),
-                        ),
-                      ),
-                    ],
+          const SizedBox(height: 12),
+          ...items.asMap().entries.map(
+            (entry) => Padding(
+              padding: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Transform.translate(
+                    offset: const Offset(0, 4),
+                    child: Icon(
+                      title == 'Included' ? Icons.check_circle : Icons.cancel,
+                      color: color[600],
+                      size: 20,
+                    ),
                   ),
-                ),
-              )
-              .toList(),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      entry.value,
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -832,78 +943,85 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       duration: const Duration(milliseconds: 500),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [const Color.fromARGB(255, 209, 182, 204), Colors.blue[50]!],
-        ),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.15),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.blue[100]!),
       ),
       child: Form(
         key: _formKey,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text(
-                  '£${price.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                const Text(
-                  'Per Person',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.orange[600]!, Colors.red[500]!],
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.teal[50],
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.teal[100]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Your Details',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal,
                     ),
-                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                    Icons.bookmark,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                AutoSizeText(
-                  'Book This Tour',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[900],
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 15),
+                  ..._buildFormFields(),
+                  const SizedBox(height: 15),
+                  _buildDateField(),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
-            ..._buildFormFields(),
-            _buildDateField(),
-            const SizedBox(height: 15),
-            _buildNumberFields(),
-            const SizedBox(height: 15),
-            _buildTotalPrice(totalPrice),
-            const SizedBox(height: 15),
-            _buildBookButton(),
-            const SizedBox(height: 15),
-            _buildWhyChooseUs(),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.teal[50],
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.teal[100]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '£${price.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Text(
+                        'Per Person',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  _buildNumberFields(),
+                  const SizedBox(height: 15),
+                  _buildTotalPrice(totalPrice),
+                  const SizedBox(height: 15),
+                  _buildBookButton(),
+                  const SizedBox(height: 15),
+                  _buildWhyChooseUs(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -914,20 +1032,20 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     final fields = [
       {
         'key': 'name',
-        'hint': 'John Doe',
-        'icon': Icons.person,
+        'hint': 'Enter your full name',
+        'icon': Icons.person_outline,
         'label': 'Full Name',
       },
       {
         'key': 'email',
-        'hint': 'john@example.com',
-        'icon': Icons.email,
+        'hint': 'Enter your email',
+        'icon': Icons.email_outlined,
         'label': 'Email Address',
       },
       {
         'key': 'phone',
-        'hint': '+201068561700',
-        'icon': Icons.phone,
+        'hint': 'Enter your phone number',
+        'icon': Icons.phone_outlined,
         'label': 'WhatsApp Number',
       },
     ];
@@ -935,15 +1053,16 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     return fields
         .map(
           (field) => Padding(
-            padding: const EdgeInsets.only(bottom: 15),
+            padding: const EdgeInsets.only(bottom: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   field['label'] as String,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey[800],
+                    color: Colors.black87,
+                    fontSize: 14,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -953,14 +1072,19 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                     hintText: field['hint'] as String,
                     prefixIcon: Icon(
                       field['icon'] as IconData,
-                      color: Colors.blue[600],
+                      color: Colors.teal,
                       size: 20,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
                   ),
                   validator:
                       (value) =>
@@ -979,11 +1103,12 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Select Date',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
+            color: Colors.black87,
+            fontSize: 14,
           ),
         ),
         const SizedBox(height: 6),
@@ -994,27 +1119,48 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
               initialDate: selectedDate ?? DateTime.now(),
               firstDate: DateTime.now(),
               lastDate: DateTime.now().add(const Duration(days: 365)),
+              builder: (context, child) {
+                return Theme(
+                  data: ThemeData.light().copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: Colors.teal,
+                      onPrimary: Colors.white,
+                      surface: Colors.white,
+                      onSurface: Colors.black87,
+                    ),
+                    dialogBackgroundColor: Colors.white,
+                  ),
+                  child: child!,
+                );
+              },
             );
             if (picked != null) setState(() => selectedDate = picked);
           },
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.grey[50],
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.teal[100]!),
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: Colors.blue[600], size: 16),
+                Icon(
+                  Icons.calendar_today_outlined,
+                  color: Colors.teal,
+                  size: 20,
+                ),
                 const SizedBox(width: 10),
                 Text(
                   selectedDate != null
-                      ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                      ? DateFormat('dd MMM yyyy').format(selectedDate!)
                       : 'Select a date',
                   style: TextStyle(
                     color:
-                        selectedDate != null ? Colors.black : Colors.grey[600],
+                        selectedDate != null
+                            ? Colors.black87
+                            : Colors.grey[600],
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -1035,7 +1181,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             (value) => setState(() => adults = value),
           ),
         ),
-        const SizedBox(width: 15),
+        const SizedBox(width: 12),
         Expanded(
           child: _buildNumberField(
             'Children',
@@ -1053,40 +1199,60 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
-            color: Colors.grey[800],
+            color: Colors.black87,
+            fontSize: 14,
           ),
         ),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[300]!),
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.grey[50],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.teal[100]!),
           ),
           child: Row(
             children: [
               Expanded(
-                child: Text(value.toString(), textAlign: TextAlign.center),
+                child: Text(
+                  value.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                ),
               ),
               Column(
                 children: [
                   GestureDetector(
                     onTap: () => onChanged(value + 1),
-                    child: Icon(
-                      Icons.keyboard_arrow_up,
-                      color: Colors.green[600],
-                      size: 20,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.teal,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 4),
                   GestureDetector(
                     onTap: value > 0 ? () => onChanged(value - 1) : null,
-                    child: Icon(
-                      Icons.keyboard_arrow_down,
-                      color: value > 0 ? Colors.red[600] : Colors.grey[400],
-                      size: 20,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: value > 0 ? Colors.red : Colors.grey[400],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.remove,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                     ),
                   ),
                 ],
@@ -1100,11 +1266,9 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
 
   Widget _buildTotalPrice(String totalPrice) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1a73e8), Color(0xFF1a73e8)],
-        ),
+        color: Colors.teal,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -1115,19 +1279,19 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
             children: [
               const Text(
                 'Total Price',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
               Text(
                 '£$totalPrice',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const Text('£', style: TextStyle(color: Colors.white, fontSize: 22)),
+          const Icon(Icons.monetization_on, color: Colors.white, size: 24),
         ],
       ),
     );
@@ -1139,11 +1303,11 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
       height: 50,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xfffedc07),
+          backgroundColor: Colors.amber,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          elevation: 6,
+          elevation: 4,
         ),
         onPressed: _isBookingInProgress ? null : _submitBooking,
         child:
@@ -1159,12 +1323,12 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                 : const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.rocket_launch, color: Colors.white),
+                    Icon(Icons.flight_takeoff, color: Colors.white),
                     SizedBox(width: 8),
                     AutoSizeText(
-                      'Book Your Tour',
+                      'Book Now',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -1177,36 +1341,44 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
 
   Widget _buildWhyChooseUs() {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.green[50],
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.green[200]!),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green[100]!),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Why Choose Us?',
+            'Why Book With Us?',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),
           ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Icon(Icons.verified, color: Colors.green[600], size: 18),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Unbeatable Prices',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.price_check, color: Colors.green[600], size: 14),
-              const SizedBox(width: 6),
-              const Expanded(child: Text('Best price guarantee')),
-            ],
-          ),
-          const SizedBox(height: 5),
-          Row(
-            children: [
-              Icon(Icons.support_agent, color: Colors.green[600], size: 14),
-              const SizedBox(width: 6),
-              const Expanded(child: Text('24/7 customer support')),
+              Icon(Icons.support_agent, color: Colors.green[600], size: 18),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text('24/7 Support', style: TextStyle(fontSize: 14)),
+              ),
             ],
           ),
         ],

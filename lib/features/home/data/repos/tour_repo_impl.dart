@@ -31,4 +31,9 @@ class TourRepoImpl implements TourRepo {
       governorateName,
     );
   }
+
+  @override
+  Future<List<TourModel>> getFavouriteTours() {
+    return firestoreServices.getFavouriteTours();
+  }
 }

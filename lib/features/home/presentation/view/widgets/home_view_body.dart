@@ -12,23 +12,47 @@ class HomeViewBody extends StatefulWidget {
 }
 
 class _HomeViewBodyState extends State<HomeViewBody> {
-  final GlobalKey _footerKey = GlobalKey();
-
+  final GlobalKey footerKey = GlobalKey();
+  final GlobalKey howBookKey = GlobalKey();
+  final GlobalKey offersKey = GlobalKey();
+  final GlobalKey aboutKey = GlobalKey();
+  final GlobalKey favKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
-        child: CustomAppBar(footerKey: _footerKey),
+        child: CustomAppBar(
+          footerKey: footerKey,
+          howBookKey: howBookKey,
+          offersKey: offersKey,
+          aboutKey: aboutKey,
+          favKey: favKey,
+        ),
       ),
-      endDrawer: width < 800 ? CustomDrawer(footerKey: _footerKey) : null,
+      endDrawer:
+          width < 1440
+              ? CustomDrawer(
+                favKey: favKey,
+                footerKey: footerKey,
+                howBookKey: howBookKey,
+                offersKey: offersKey,
+                aboutKey: aboutKey,
+              )
+              : null,
       body: Stack(
         children: [
           SelectableRegion(
             focusNode: FocusNode(),
             selectionControls: MaterialTextSelectionControls(),
-            child: HomeContent(footerKey: _footerKey),
+            child: HomeContent(
+              favKey: favKey,
+              footerKey: footerKey,
+              howBookKey: howBookKey,
+              offersKey: offersKey,
+              aboutKey: aboutKey,
+            ),
           ),
           const UpArrow(),
         ],

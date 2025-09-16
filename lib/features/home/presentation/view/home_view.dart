@@ -1,5 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:on_the_go/core/services/firestore_services.dart';
+import 'package:on_the_go/features/home/data/repos/tour_repo_impl.dart';
+import 'package:on_the_go/features/home/domain/use_cases/get_favourites_tours_usecases.dart';
+import 'package:on_the_go/features/home/presentation/manager/favourite_tour/favourite_tour_cubit.dart';
+import 'package:on_the_go/features/home/presentation/manager/get_categories/get_categories_cubit.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/home_view_body.dart';
 
 class HomeView extends StatefulWidget {
@@ -37,6 +43,19 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return HomeViewBody();
+    return BlocProvider(
+      create: (context) => GetCategoryCubit(),
+      child: BlocProvider(
+        create:
+            (context) => FavouriteTourCubit(
+              GetFavouritesToursUseCase(
+                TourRepoImpl(
+                  FirestoreServices(firestore: FirebaseFirestore.instance),
+                ),
+              ),
+            ),
+        child: HomeViewBody(),
+      ),
+    );
   }
 }
