@@ -26,6 +26,8 @@ class TourModel extends Tour {
     required super.category,
     required super.review,
     required super.rating,
+    required super.includedItems,
+    required super.notIncludedItems,
   });
 
   Map<String, dynamic> toJson() {
@@ -53,6 +55,8 @@ class TourModel extends Tour {
       'category': category,
       'review': review,
       'rating': rating,
+      'includedItems': includedItems,
+      'notIncludedItems': notIncludedItems,
     };
   }
 
@@ -60,6 +64,7 @@ class TourModel extends Tour {
     return TourModel(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
+
       description: json['description'] ?? '',
       timeOfTour: json['timeOfTour'] ?? '',
       ageRequirement: json['ageRequirement'] ?? '',
@@ -89,6 +94,8 @@ class TourModel extends Tour {
       category: json['category'] ?? 'Red Sea',
       review: json['review'] ?? "",
       rating: json['rating'] ?? "0",
+      includedItems: json['includedItems'] ?? [],
+      notIncludedItems: json['notIncludedItems'] ?? [],
     );
   }
 

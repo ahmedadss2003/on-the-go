@@ -48,64 +48,62 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (width > tabletMobileWidth)
             Padding(
               padding: const EdgeInsets.only(top: 15),
-              child: Expanded(
-                child: Row(
-                  children: [
-                    HoverMenuDestinationButton(),
-                    SizedBox(width: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 18),
+              child: Row(
+                children: [
+                  HoverMenuDestinationButton(),
+                  SizedBox(width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
 
-                      child: CustomAppBarButton(
-                        onPressed: () {
-                          _scrollToSection(context, howBookKey);
-                        },
-                        txt: "How Book With Us",
-                      ),
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        _scrollToSection(context, howBookKey);
+                      },
+                      txt: "How Book With Us",
                     ),
-                    SizedBox(width: 30),
+                  ),
+                  SizedBox(width: 30),
 
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 18),
-                      child: CustomAppBarButton(
-                        onPressed: () {
-                          _scrollToSection(context, offersKey);
-                        },
-                        txt: "Offers",
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        _scrollToSection(context, offersKey);
+                      },
+                      txt: "Offers",
                     ),
-                    SizedBox(width: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 18),
-                      child: CustomAppBarButton(
-                        onPressed: () {
-                          _scrollToSection(context, favKey);
-                        },
-                        txt: "Favorites",
-                      ),
+                  ),
+                  SizedBox(width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        _scrollToSection(context, favKey);
+                      },
+                      txt: "Favorites",
                     ),
-                    SizedBox(width: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 18),
-                      child: CustomAppBarButton(
-                        onPressed: () {
-                          _scrollToSection(context, aboutKey);
-                        },
-                        txt: "About Us",
-                      ),
+                  ),
+                  SizedBox(width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        _scrollToSection(context, aboutKey);
+                      },
+                      txt: "About Us",
                     ),
-                    SizedBox(width: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 18),
-                      child: CustomAppBarButton(
-                        onPressed: () {
-                          context.go(TransporationBookingView.routeName);
-                        },
-                        txt: "Transportation",
-                      ),
+                  ),
+                  SizedBox(width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        context.go(TransporationBookingView.routeName);
+                      },
+                      txt: "Transportation",
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           Spacer(),

@@ -16,15 +16,9 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '${DiscoverPlacesView.routeName}/:governmentName',
       builder: (context, state) {
-        final TourModel tourModel = state.extra as TourModel;
-
         final governmentName = state.pathParameters['governmentName']!;
         final type = state.uri.queryParameters['type']; // optional
-        return DiscoverPlacesView(
-          governmentName: governmentName,
-          type: type,
-          tourModel: tourModel,
-        );
+        return DiscoverPlacesView(governmentName: governmentName, type: type);
       },
     ),
 

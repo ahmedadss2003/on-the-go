@@ -830,11 +830,15 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
               isMobile
                   ? Column(
                     children: [
-                      _buildIncludedCard('Included', included, Colors.green),
+                      _buildIncludedCard(
+                        'Included',
+                        widget.tourModel.includedItems,
+                        Colors.green,
+                      ),
                       const SizedBox(height: 12),
                       _buildIncludedCard(
                         'Not Included',
-                        notIncluded,
+                        widget.tourModel.notIncludedItems,
                         Colors.red,
                       ),
                     ],
@@ -844,7 +848,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                       Expanded(
                         child: _buildIncludedCard(
                           'Included',
-                          included,
+                          widget.tourModel.includedItems,
                           Colors.green,
                         ),
                       ),
@@ -852,7 +856,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                       Expanded(
                         child: _buildIncludedCard(
                           'Not Included',
-                          notIncluded,
+                          widget.tourModel.notIncludedItems,
                           Colors.red,
                         ),
                       ),
@@ -865,7 +869,7 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
 
   Widget _buildIncludedCard(
     String title,
-    List<String> items,
+    List<dynamic> items,
     MaterialColor color,
   ) {
     return Container(

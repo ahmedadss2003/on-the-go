@@ -10,11 +10,11 @@ class DiscoverPlacesViewBody extends StatefulWidget {
     required this.governMentName,
 
     this.type,
-    required this.tourModel,
+    this.tourModel,
   });
   final String governMentName;
   final String? type;
-  final TourModel tourModel;
+  final TourModel? tourModel;
   @override
   State<DiscoverPlacesViewBody> createState() => _DiscoverPlacesViewBodyState();
 }
@@ -171,8 +171,11 @@ class _DiscoverPlacesViewBodyState extends State<DiscoverPlacesViewBody>
                                         widget.type != null
                                             ? AutoSizeText(
                                               "With Category: ${widget.type}",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
                                             )
-                                            : Text(""),
+                                            : const SizedBox.shrink(),
                                         const SizedBox(height: 12),
                                         AutoSizeText(
                                           maxLines: 1,

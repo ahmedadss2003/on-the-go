@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:on_the_go/core/widgets/tour_card.dart';
 import 'package:on_the_go/features/home/presentation/manager/favourite_tour/favourite_tour_cubit.dart';
-import 'package:on_the_go/features/home/presentation/manager/tour_cubit/tour_cubit_cubit.dart';
 
 class FavouriteTripsSection extends StatelessWidget {
   const FavouriteTripsSection({super.key});

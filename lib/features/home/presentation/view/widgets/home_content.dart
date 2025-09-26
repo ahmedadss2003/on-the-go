@@ -47,10 +47,7 @@ class HomeContent extends StatelessWidget {
                 child: Column(
                   children: [
                     // Offers Section with Key
-                    Container(
-                      key: offersKey,
-                      child: const OfferContainerSection(),
-                    ),
+                    const OfferContainerSection(),
                     const SizedBox(height: 100),
                     Container(
                       decoration: BoxDecoration(

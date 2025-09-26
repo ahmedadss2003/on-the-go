@@ -24,6 +24,8 @@ class Tour {
   final bool isBestSeller;
   final String? review;
   final String? rating;
+  final List<dynamic> includedItems;
+  final List<dynamic> notIncludedItems;
 
   Tour({
     required this.id,
@@ -48,6 +50,8 @@ class Tour {
     required this.review,
     required this.rating,
     required this.isBestSeller,
+    required this.includedItems,
+    required this.notIncludedItems,
   });
 
   // Add this toString method to help with debugging

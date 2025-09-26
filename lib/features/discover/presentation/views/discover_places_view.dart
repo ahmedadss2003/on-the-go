@@ -7,12 +7,12 @@ class DiscoverPlacesView extends StatelessWidget {
     super.key,
     required this.governmentName,
     this.type,
-    required this.tourModel,
+    this.tourModel,
   });
   static const routeName = "/discover_places";
   final String governmentName;
   final String? type;
-  final TourModel tourModel;
+  final TourModel? tourModel;
   @override
   Widget build(BuildContext context) {
     return SelectableRegion(

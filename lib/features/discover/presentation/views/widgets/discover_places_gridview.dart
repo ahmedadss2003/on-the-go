@@ -9,11 +9,11 @@ class CustomDiscoverPlacesByCategoryGridView extends StatefulWidget {
     super.key,
     required this.governMentName,
     this.type,
-    required this.currentTour,
+    this.currentTour,
   });
   final String governMentName;
   final String? type;
-  final TourModel currentTour;
+  final TourModel? currentTour;
 
   @override
   State<CustomDiscoverPlacesByCategoryGridView> createState() =>

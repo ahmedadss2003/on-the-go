@@ -90,7 +90,7 @@ class _PhotoDisplaySectionState extends State<PhotoDisplaySection>
           alignment: Alignment.center,
           children: [
             Container(
-              height: 400,
+              height: width < 1000 ? 400 : 700,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
