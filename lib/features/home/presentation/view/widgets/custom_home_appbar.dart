@@ -36,7 +36,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final double tabletMobileWidth = 1440;
+    final double tabletMobileWidth = 1600;
     return AppBar(
       backgroundColor: Color.fromARGB(255, 22, 14, 78),
       leading: width > 600 ? const SizedBox() : null,
@@ -103,6 +103,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       txt: "Transportation",
                     ),
                   ),
+                  SizedBox(width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 18),
+                    child: CustomAppBarButton(
+                      onPressed: () {
+                        _launchUrl();
+                      },
+                      txt: "Travel Blog",
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -131,7 +141,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   void _launchWhatsApp() async {
-    final Uri whatsapp = Uri.parse("https://wa.me/+201120919120");
+    final Uri whatsapp = Uri.parse("https://wa.me/+201004536956");
+    if (await canLaunchUrl(whatsapp)) {
+      await launchUrl(whatsapp);
+    } else {
+      debugPrint("Could not launch WhatsApp");
+    }
+  }
+
+  void _launchUrl() async {
+    final Uri whatsapp = Uri.parse("https://onthegoexcursions.medium.com/");
     if (await canLaunchUrl(whatsapp)) {
       await launchUrl(whatsapp);
     } else {

@@ -262,7 +262,7 @@ class _TourCardState extends State<TourCard>
                               children: [
                                 if (widget.tourModel.discount > 0) ...[
                                   Text(
-                                    "\$${widget.tourModel.priceAdult.toInt()}",
+                                    "£${widget.tourModel.priceAdult.toInt()}",
                                     style: const TextStyle(
                                       color: Colors.white60,
                                       fontSize: 12,
@@ -272,7 +272,7 @@ class _TourCardState extends State<TourCard>
                                   const SizedBox(width: 4),
                                 ],
                                 Text(
-                                  "\$${_getFinalPrice().toInt()}",
+                                  "£${_getFinalPrice().toInt()}",
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 14,

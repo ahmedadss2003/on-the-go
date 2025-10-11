@@ -1,5 +1,6 @@
 import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/core/services/firestore_services.dart';
+import 'package:on_the_go/features/home/data/models/image_model.dart';
 import 'package:on_the_go/features/home/domain/repos/tour_repo.dart';
 
 class TourRepoImpl implements TourRepo {
@@ -35,5 +36,10 @@ class TourRepoImpl implements TourRepo {
   @override
   Future<List<TourModel>> getFavouriteTours() {
     return firestoreServices.getFavouriteTours();
+  }
+
+  @override
+  Future<List<ImageModel>> getAllImages() {
+    return firestoreServices.getAllImages();
   }
 }

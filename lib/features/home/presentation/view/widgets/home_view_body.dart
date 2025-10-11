@@ -32,7 +32,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
         ),
       ),
       endDrawer:
-          width < 1440
+          width < 1600
               ? CustomDrawer(
                 favKey: favKey,
                 footerKey: footerKey,

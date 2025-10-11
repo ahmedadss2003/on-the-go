@@ -78,6 +78,10 @@ class CustomDrawer extends StatelessWidget {
               context.go(TransporationBookingView.routeName);
               Navigator.pop(context);
             }),
+            _buildDrawerItem(context, Icons.contact_mail, "Travel Blog", () {
+              _launchUrl();
+              Navigator.pop(context);
+            }),
           ],
         ),
       ),
@@ -98,7 +102,16 @@ class CustomDrawer extends StatelessWidget {
   }
 
   void _launchWhatsApp() async {
-    final Uri whatsapp = Uri.parse("https://wa.me/+201120919120");
+    final Uri whatsapp = Uri.parse("https://wa.me/+201004536956");
+    if (await canLaunchUrl(whatsapp)) {
+      await launchUrl(whatsapp);
+    } else {
+      debugPrint("Could not launch WhatsApp");
+    }
+  }
+
+  void _launchUrl() async {
+    final Uri whatsapp = Uri.parse("https://onthegoexcursions.medium.com/");
     if (await canLaunchUrl(whatsapp)) {
       await launchUrl(whatsapp);
     } else {

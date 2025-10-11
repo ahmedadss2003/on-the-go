@@ -116,21 +116,19 @@ class FooterSection extends StatelessWidget {
           children: [
             OptimizedSocialIcon(
               icon: Icons.facebook,
-              url:
-                  'https://www.facebook.com/profile.php?id=61575163371185&mibextid=wwXIfr&mibextid=wwXIfr',
+              url: 'https://www.facebook.com/profile.php?id=61550037721105',
               color: const Color(0xFF1877F2),
             ),
             const SizedBox(width: 20),
             OptimizedSocialIcon(
               icon: Icons.camera_alt,
-              url:
-                  'https://www.instagram.com/sharmdesertsafari?igsh=MWIwYXF3MnIzeDdwcg%3D%3D&utm_source=qr',
+              url: 'https://www.instagram.com/onthegoexcursions/',
               color: const Color(0xFFE1306C),
             ),
             const SizedBox(width: 20),
             OptimizedSocialIcon(
               icon: Icons.phone,
-              url: 'tel:+201120919120',
+              url: 'tel:+201004536956',
               color: const Color(0xFF25D366),
             ),
           ],
@@ -167,7 +165,7 @@ class FooterSection extends StatelessWidget {
               Icon(Icons.email, color: const Color(0xFF4A90E2), size: 18),
               const SizedBox(width: 8),
               AutoSizeText(
-                '+201120919120',
+                '+201004536956',
                 style: TextStyle(color: Colors.grey.shade300, fontSize: 14),
               ),
             ],
@@ -181,7 +179,7 @@ class FooterSection extends StatelessWidget {
     return Column(
       children: [
         Text(
-          '© 2025 On The Beach Excursions.',
+          '© 2015 On The Beach Excursions.',
           style: TextStyle(
             color: Colors.grey.shade500,
             fontSize: 14,

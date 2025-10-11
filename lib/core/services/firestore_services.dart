@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:on_the_go/core/models/category_model.dart';
 import 'package:on_the_go/core/models/tour_model.dart';
+import 'package:on_the_go/features/home/data/models/image_model.dart';
 
 class FirestoreServices {
   final FirebaseFirestore firestore;
@@ -114,5 +115,14 @@ class FirestoreServices {
     } catch (e) {
       throw Exception("Failed to book transportation: $e");
     }
+  }
+
+  Future<List<ImageModel>> getAllImages() async {
+    final snapshot = await firestore.collection('images').get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return ImageModel.fromJson(data);
+    }).toList();
   }
 }

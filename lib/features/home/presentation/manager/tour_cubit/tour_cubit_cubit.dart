@@ -28,7 +28,6 @@ class TourCubitCubit extends Cubit<TourCubitState> {
   // Cache variables
   List<TourModel>? _allToursCache;
   List<TourModel>? _bestSellerToursCache;
-  List<TourModel>? _favouritesToursCache;
   final Map<String, List<TourModel>> _categoryCache = {};
   final Map<String, List<TourModel>> _categoryGovernorateCache = {};
 

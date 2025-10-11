@@ -479,6 +479,13 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
                       ),
                       const SizedBox(width: 20),
                       _buildHeroStat(
+                        widget.tourModel.review.toString(),
+                        'Review',
+                        Icons.reviews,
+                        Colors.amber,
+                      ),
+                      const SizedBox(width: 20),
+                      _buildHeroStat(
                         widget.tourModel.timeOfTour,
                         'Duration',
                         Icons.timer,

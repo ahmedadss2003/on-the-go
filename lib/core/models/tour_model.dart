@@ -118,7 +118,7 @@ class TourModel extends Tour {
         return TimeOfDay(hour: hour, minute: minute);
       }
     } catch (e) {
-      print('Error parsing time: $e');
+      return null;
     }
     return null;
   }

@@ -34,8 +34,8 @@ class TimeToDiscoverContainer extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           AutoSizeText(
-            "Discover the world your way – on a group tour, private adventure, safari, or sailing trip. From ancient wonders to wild landscapes and sun-soaked coasts, local guides help you uncover authentic experiences in over +70 destinations.",
-            style: TextStyle(color: Colors.black, fontSize: 14),
+            "we transform every trip into an unforgettable story.We are a trusted and licensed tour company in Egypt, offering tailor-made journeys that blend ancient wonders, modern adventures, and authentic local experiences.",
+            style: TextStyle(color: Colors.black, fontSize: 18),
           ),
         ],
       ),

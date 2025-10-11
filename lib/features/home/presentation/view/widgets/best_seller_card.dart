@@ -241,7 +241,7 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '\$${originalPrice.toInt()}',
+                          '£${originalPrice.toInt()}',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFFE53E3E),
@@ -269,7 +269,7 @@ class _BestSellerTourCardState extends State<BestSellerTourCard> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '\$${widget.tour.discount > 0 ? discountedPrice.toInt() : originalPrice.toInt()}',
+                        '£${widget.tour.discount > 0 ? discountedPrice.toInt() : originalPrice.toInt()}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
