@@ -1,63 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <base href="$FLUTTER_BASE_HREF" />
+    <base href="/" />
+
+    <!-- ✅ FIXED: Multiple Favicon Formats for Better Search Indexing -->
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="web-app-manifest-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="web-app-manifest-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- ✅ Meta Description for SEO -->
+    <!-- ✅ SEO -->
     <meta
       name="description"
       content="Explore Egypt with On The Go — your trusted travel companion for Cairo, Luxor, Aswan, and Red Sea excursions. Book unforgettable Egypt tours, Nile cruises, and adventures today!"
     />
-
-    <!-- ✅ Keywords for SEO -->
     <meta
       name="keywords"
       content="Egypt tours, Cairo tours, Luxor excursions, Aswan travel, Sharm El Sheikh, Red Sea adventures, Nile cruises, Egypt travel packages"
     />
-
     <meta name="author" content="On The Go Excursions" />
     <meta name="robots" content="index, follow" />
 
-    <!-- ✅ Favicon and Apple Icon -->
-    <link rel="icon" type="image/png" href="/assets/images/logo2.png" />
-    <link rel="apple-touch-icon" href="/assets/images/logo2.png" />
-
-    <!-- ✅ Open Graph for Social Media -->
+    <!-- ✅ Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://onthegoexcursions.com/" />
-    <meta property="og:title" content="On The Go - Egypt Tours & Excursions" />
+    <meta property="og:title" content="On The Go Excursions | Egypt Tours & Excursions" />
     <meta
       property="og:description"
       content="Discover Egypt with local experts — explore Cairo, Luxor, Aswan, and the Red Sea. Book top-rated tours, Nile cruises, and desert safaris with On The Go Excursions."
     />
     <meta
       property="og:image"
-      content="https://onthegoexcursions.com/assets/images/logo2.png"
+      content="https://onthegoexcursions.com/android-chrome-512x512.png"
     />
 
     <!-- ✅ Twitter Meta -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="On The Go - Egypt Tours & Excursions" />
+    <meta name="twitter:title" content="On The Go Excursions | Egypt Tours & Excursions" />
     <meta
       name="twitter:description"
       content="Book unforgettable Egypt tours — Cairo, Luxor, Aswan, and the Red Sea with local guides and luxury experiences."
     />
     <meta
       name="twitter:image"
-      content="https://onthegoexcursions.com/assets/images/logo2.png"
+      content="https://onthegoexcursions.com/android-chrome-512x512.png"
     />
 
     <!-- ✅ Title -->
-    <title>On The Go - Egypt Tours & Excursions</title>
+    <title>On The Go Excursions | Egypt Tours & Excursions</title>
 
     <link rel="manifest" href="manifest.json" />
+
+    <!-- ✅ Landing Page Styles -->
+    <style>
+      body {
+        margin: 0;
+        background: #ffffff;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      #landing {
+        text-align: center;
+        animation: fadeIn 0.8s ease-in-out;
+      }
+
+      .logo {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 16px;
+      }
+
+      h2 {
+        font-size: 22px;
+        color: #0077b6;
+        margin: 8px 0;
+      }
+
+      p {
+        color: #555;
+        font-size: 16px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
   </head>
 
   <body>
+    <!-- ✅ Landing Page -->
+    <div id="landing">
+      <img src="assets/images/logo2.png" alt="On The Go Excursions Logo" class="logo" />
+      <h2>Welcome to On The Go</h2>
+      <p>Loading your travel experience...</p>
+    </div>
+
+    <!-- ✅ Flutter App Bootstrap -->
     <script src="flutter_bootstrap.js" async></script>
+
+    <!-- ✅ Hide Landing Page After Flutter Loads -->
+    <script>
+      window.addEventListener("flutter-first-frame", function () {
+        document.getElementById("landing").style.display = "none";
+      });
+    </script>
   </body>
 </html>

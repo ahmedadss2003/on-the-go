@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:on_the_go/features/about_us/presentation/pages/about_us_view.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
 import 'package:on_the_go/features/transportation/presentation/transporation_Booking_view.dart';
+import 'package:on_the_go/features/why_choose_us/presentation/why_choose_us.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -54,7 +56,11 @@ class CustomDrawer extends StatelessWidget {
             ),
             SizedBox(height: 6),
             _buildDrawerItem(context, Icons.info_outline, "About Us", () {
-              _scrollToSection(context, aboutKey);
+              context.go(AboutUsView.routeName);
+              Navigator.pop(context);
+            }),
+            _buildDrawerItem(context, Icons.info_outline, "Why Choose Us", () {
+              context.go(WhyChooseUsView.routeName);
               Navigator.pop(context);
             }),
             _buildDrawerItem(context, Icons.local_offer, "Offers", () {

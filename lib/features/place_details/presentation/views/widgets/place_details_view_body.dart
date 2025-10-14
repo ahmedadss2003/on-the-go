@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_expanded_tile/flutter_expanded_tile.dart';
 import 'package:intl/intl.dart';
 import 'package:on_the_go/core/models/tour_model.dart';
+import 'package:on_the_go/core/services/seo_service.dart';
 import 'package:on_the_go/core/widgets/youtube_section.dart';
 import 'package:on_the_go/features/discover/presentation/manager/booking_cubit/booking_cubit.dart';
 import 'package:on_the_go/features/discover/presentation/views/widgets/discover_places_gridview.dart';
@@ -16,22 +17,6 @@ class PlaceDetailsViewBody extends StatefulWidget {
   @override
   PlaceDetailsViewBodyState createState() => PlaceDetailsViewBodyState();
 }
-
-List<String> included = [
-  "Return fly tickets",
-  "All transfers by A/C vehicle in Sharm el Sheikh and Cairo",
-  "Giza Pyramids, Sphinx and Kephren Temple",
-  "English speaking tour guide",
-  "Lunch in Cairo",
-  "Egyptian Museum",
-];
-
-List<String> notIncluded = [
-  "Drinks on the Restaurant",
-  "Boat ride on the Nile",
-  "Any extras not mentioned in the program",
-  "Entrance Fees",
-];
 
 class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     with SingleTickerProviderStateMixin {
@@ -72,6 +57,23 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
         );
       }
     });
+    _updateSEOMetaTags();
+  }
+
+  void _updateSEOMetaTags() {
+    final url = Uri.base.toString();
+    final title = '${widget.tourModel.title} | On The Go Excursions';
+    final description = widget.tourModel.description; // الوصف الحقيقي
+    final imageUrl =
+        widget.tourModel.images.isNotEmpty
+            ? widget.tourModel.images.first.url
+            : 'https://onthegoexcursions.com/android-chrome-512x512.png';
+    SEOService.updateMetaTags(
+      title: title,
+      description: description,
+      url: url,
+      imageUrl: imageUrl,
+    );
   }
 
   @override

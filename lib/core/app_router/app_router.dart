@@ -1,10 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_the_go/core/models/tour_model.dart';
+import 'package:on_the_go/features/about_us/presentation/pages/about_us_view.dart';
 import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
 import 'package:on_the_go/features/home/presentation/view/home_view.dart';
 import 'package:on_the_go/features/place_details/presentation/views/place_details_view.dart';
 import 'package:on_the_go/features/place_details/presentation/views/place_details_wraper.dart';
 import 'package:on_the_go/features/transportation/presentation/transporation_Booking_view.dart';
+import 'package:on_the_go/features/why_choose_us/presentation/why_choose_us.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: HomeView.routeName,
@@ -28,6 +31,38 @@ final GoRouter router = GoRouter(
         final id = state.pathParameters['id']!;
         return PlaceDetailsWrapper(id: id);
       },
+    ),
+    GoRoute(
+      path: AboutUsView.routeName,
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const AboutUsView(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+    ),
+    GoRoute(
+      path: WhyChooseUsView.routeName,
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const WhyChooseUsView(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
     ),
     GoRoute(
       path: TransporationBookingView.routeName,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:on_the_go/features/about_us/presentation/pages/about_us_view.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/contact_us_button.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
 import 'package:on_the_go/features/transportation/presentation/transporation_Booking_view.dart';
@@ -88,7 +89,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     padding: const EdgeInsets.only(bottom: 18),
                     child: CustomAppBarButton(
                       onPressed: () {
-                        _scrollToSection(context, aboutKey);
+                        context.go(AboutUsView.routeName);
                       },
                       txt: "About Us",
                     ),

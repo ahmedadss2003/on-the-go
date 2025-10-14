@@ -33,7 +33,7 @@ class BestSellerTripsSection extends StatelessWidget {
               const SizedBox(height: 30),
               GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: tours.length,
+                itemCount: 12,
                 shrinkWrap: true,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount:
