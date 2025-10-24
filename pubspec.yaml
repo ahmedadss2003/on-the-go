@@ -52,6 +52,10 @@ dependencies:
   get_it: ^8.2.0
   dio: ^5.9.0
   flutter_web_browser: ^0.17.3
+  mailer: ^6.5.0
+  http: ^1.5.0
+  animate_do: ^4.2.0
+  google_fonts: ^6.3.2
 
 dev_dependencies:
   flutter_test:

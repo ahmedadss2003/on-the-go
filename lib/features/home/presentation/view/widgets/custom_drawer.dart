@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_the_go/features/about_us/presentation/pages/about_us_view.dart';
+import 'package:on_the_go/features/contact_us/presentation/pages/contact_us.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
 import 'package:on_the_go/features/transportation/presentation/transporation_Booking_view.dart';
 import 'package:on_the_go/features/why_choose_us/presentation/why_choose_us.dart';
@@ -9,17 +10,13 @@ import 'package:url_launcher/url_launcher.dart';
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({
     super.key,
-    required this.footerKey,
     required this.howBookKey,
     required this.offersKey,
-    required this.aboutKey,
     required this.favKey,
   });
 
-  final GlobalKey footerKey;
   final GlobalKey howBookKey;
   final GlobalKey offersKey;
-  final GlobalKey aboutKey;
   final GlobalKey favKey;
   void _scrollToSection(BuildContext context, GlobalKey sectionKey) {
     if (sectionKey.currentContext != null) {
@@ -77,7 +74,7 @@ class CustomDrawer extends StatelessWidget {
             }),
 
             _buildDrawerItem(context, Icons.contact_mail, "Contact", () {
-              _launchWhatsApp();
+              context.go(ContactUsView.routeName);
               Navigator.pop(context);
             }),
             _buildDrawerItem(context, Icons.contact_mail, "Transportation", () {

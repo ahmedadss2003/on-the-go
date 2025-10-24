@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_the_go/features/about_us/presentation/pages/about_us_view.dart';
+import 'package:on_the_go/features/contact_us/presentation/pages/contact_us.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/contact_us_button.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/destionation_button.dart';
 import 'package:on_the_go/features/transportation/presentation/transporation_Booking_view.dart';
+import 'package:on_the_go/features/why_choose_us/presentation/why_choose_us.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
     super.key,
-    required this.footerKey,
+
     required this.howBookKey,
     required this.offersKey,
-    required this.aboutKey,
+
     required this.favKey,
   });
-  final GlobalKey footerKey;
+
   final GlobalKey howBookKey;
   final GlobalKey offersKey;
-  final GlobalKey aboutKey;
   final GlobalKey favKey;
+
   @override
   Size get preferredSize => const Size.fromHeight(80);
 
@@ -27,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (sectionKey.currentContext != null) {
       Scrollable.ensureVisible(
         sectionKey.currentContext!,
-        alignment: 0.0, // Always start from top of the section
+        alignment: 0.0,
         duration: const Duration(milliseconds: 800),
         curve: Curves.easeInOut,
       );
@@ -37,104 +39,87 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final double tabletMobileWidth = 1600;
+
     return AppBar(
-      backgroundColor: Color.fromARGB(255, 22, 14, 78),
+      backgroundColor: const Color.fromARGB(255, 22, 14, 78),
       leading: width > 600 ? const SizedBox() : null,
-      title: Row(
-        children: [
-          if (width > 1000) const SizedBox(width: 100),
-          Image.asset("assets/images/logo2.png", width: 100),
-          const SizedBox(width: 30),
-          if (width > tabletMobileWidth)
-            Padding(
-              padding: const EdgeInsets.only(top: 15),
-              child: Row(
-                children: [
-                  HoverMenuDestinationButton(),
-                  SizedBox(width: 30),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 18),
+      title: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableWidth = constraints.maxWidth;
 
-                    child: CustomAppBarButton(
-                      onPressed: () {
-                        _scrollToSection(context, howBookKey);
-                      },
-                      txt: "How Book With Us",
+          return Row(
+            children: [
+              Image.asset("assets/images/logo2.png", width: 100),
+              const SizedBox(width: 20),
+              if (width > 1200)
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        HoverMenuDestinationButton(),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed:
+                              () => _scrollToSection(context, howBookKey),
+                          txt: "How Book With Us",
+                        ),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed: () => _scrollToSection(context, offersKey),
+                          txt: "Offers",
+                        ),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed: () => _scrollToSection(context, favKey),
+                          txt: "Favorites",
+                        ),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed: () => context.go(AboutUsView.routeName),
+                          txt: "About Us",
+                        ),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed:
+                              () => context.go(WhyChooseUsView.routeName),
+                          txt: "Why Choose Us",
+                        ),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed:
+                              () => context.go(
+                                TransporationBookingView.routeName,
+                              ),
+                          txt: "Transportation",
+                        ),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed: _launchUrl,
+                          txt: "Travel Blog",
+                        ),
+                        const SizedBox(width: 20),
+                        CustomAppBarButton(
+                          onPressed: () {
+                            context.go(ContactUsView.routeName);
+                          },
+                          txt: "Contact Us",
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(width: 30),
-
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 18),
-                    child: CustomAppBarButton(
-                      onPressed: () {
-                        _scrollToSection(context, offersKey);
-                      },
-                      txt: "Offers",
-                    ),
-                  ),
-                  SizedBox(width: 30),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 18),
-                    child: CustomAppBarButton(
-                      onPressed: () {
-                        _scrollToSection(context, favKey);
-                      },
-                      txt: "Favorites",
-                    ),
-                  ),
-                  SizedBox(width: 30),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 18),
-                    child: CustomAppBarButton(
-                      onPressed: () {
-                        context.go(AboutUsView.routeName);
-                      },
-                      txt: "About Us",
-                    ),
-                  ),
-                  SizedBox(width: 30),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 18),
-                    child: CustomAppBarButton(
-                      onPressed: () {
-                        context.go(TransporationBookingView.routeName);
-                      },
-                      txt: "Transportation",
-                    ),
-                  ),
-                  SizedBox(width: 30),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 18),
-                    child: CustomAppBarButton(
-                      onPressed: () {
-                        _launchUrl();
-                      },
-                      txt: "Travel Blog",
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          Spacer(),
-          width > tabletMobileWidth
-              ? CustomAppBarButton(
-                onPressed: () {
-                  _launchWhatsApp();
-                },
-                txt: "Contact Us",
-              )
-              : const SizedBox(),
-        ],
+                ),
+            ],
+          );
+        },
       ),
       actions: [
-        if (width < tabletMobileWidth)
+        if (width < 1200)
           IconButton(
             padding: const EdgeInsets.only(right: 20, top: 15),
-            onPressed: () {
-              Scaffold.of(context).openEndDrawer();
-            },
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
             icon: const Icon(Icons.menu, color: Colors.white),
           ),
       ],
@@ -151,11 +136,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   void _launchUrl() async {
-    final Uri whatsapp = Uri.parse("https://onthegoexcursions.medium.com/");
-    if (await canLaunchUrl(whatsapp)) {
-      await launchUrl(whatsapp);
+    final Uri url = Uri.parse("https://onthegoexcursions.medium.com/");
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
-      debugPrint("Could not launch WhatsApp");
+      debugPrint("Could not launch URL");
     }
   }
 }

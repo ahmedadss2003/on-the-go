@@ -39,7 +39,6 @@ class SEOService {
             ..content = content;
       html.document.head?.append(meta);
     } else {
-      // Cast to MetaElement to access the content property
       (meta as html.MetaElement).content = content;
     }
   }

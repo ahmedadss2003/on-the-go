@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:on_the_go/features/home/data/models/government_model.dart';
 import 'package:on_the_go/features/home/presentation/view/widgets/government_tour_card.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MostPopularDestinationsContainer extends StatelessWidget {
   const MostPopularDestinationsContainer({super.key});
@@ -105,10 +106,15 @@ class MostPopularDestinationsContainer extends StatelessWidget {
                                 innerWidth < 740
                                     ? Alignment.center
                                     : Alignment.centerRight,
-                            child: Image.asset(
-                              "assets/images/tripadivsorlogo.jpg",
-                              width: innerWidth < 400 ? 100 : 150,
-                              height: innerWidth < 400 ? 100 : 150,
+                            child: GestureDetector(
+                              onTap: () {
+                                _launchtripadvisor();
+                              },
+                              child: Image.asset(
+                                "assets/images/tripadivsorlogo.jpg",
+                                width: innerWidth < 400 ? 100 : 150,
+                                height: innerWidth < 400 ? 100 : 150,
+                              ),
                             ),
                           ),
                         ],
@@ -119,7 +125,6 @@ class MostPopularDestinationsContainer extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // 🏝️ Grid or Wrap section
                 shouldCenter
                     ? Center(
                       child: Wrap(
@@ -184,5 +189,16 @@ class MostPopularDestinationsContainer extends StatelessWidget {
     final spacing = 10.0 * (crossAxisCount - 1);
     final availableWidth = screenWidth - spacing;
     return availableWidth / crossAxisCount;
+  }
+
+  void _launchtripadvisor() async {
+    final Uri tripadvisor = Uri.parse(
+      "https://www.tripadvisor.com/UserReviewEdit-g297555-d33953139-On_The_Go_Excursions-Sharm_El_Sheikh_South_Sinai_Red_Sea_and_Sinai.html",
+    );
+    if (await canLaunchUrl(tripadvisor)) {
+      await launchUrl(tripadvisor);
+    } else {
+      debugPrint("Could not launch WhatsApp");
+    }
   }
 }

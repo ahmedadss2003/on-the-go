@@ -12,10 +12,9 @@ class HomeViewBody extends StatefulWidget {
 }
 
 class _HomeViewBodyState extends State<HomeViewBody> {
-  final GlobalKey footerKey = GlobalKey();
   final GlobalKey howBookKey = GlobalKey();
   final GlobalKey offersKey = GlobalKey();
-  final GlobalKey aboutKey = GlobalKey();
+
   final GlobalKey favKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
@@ -24,21 +23,17 @@ class _HomeViewBodyState extends State<HomeViewBody> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: CustomAppBar(
-          footerKey: footerKey,
           howBookKey: howBookKey,
           offersKey: offersKey,
-          aboutKey: aboutKey,
           favKey: favKey,
         ),
       ),
       endDrawer:
-          width < 1600
+          width < 1200
               ? CustomDrawer(
                 favKey: favKey,
-                footerKey: footerKey,
                 howBookKey: howBookKey,
                 offersKey: offersKey,
-                aboutKey: aboutKey,
               )
               : null,
       body: Stack(
@@ -48,10 +43,8 @@ class _HomeViewBodyState extends State<HomeViewBody> {
             selectionControls: MaterialTextSelectionControls(),
             child: HomeContent(
               favKey: favKey,
-              footerKey: footerKey,
               howBookKey: howBookKey,
               offersKey: offersKey,
-              aboutKey: aboutKey,
             ),
           ),
           const UpArrow(),

@@ -11,7 +11,7 @@ import 'package:on_the_go/features/home/presentation/view/widgets/home_view_body
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
   static const routeName = '/';
-  static late ScrollController globalScrollController;
+  static ScrollController globalScrollController = ScrollController();
 
   @override
   State<HomeView> createState() => _HomeViewState();

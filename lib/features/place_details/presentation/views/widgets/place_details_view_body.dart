@@ -59,7 +59,6 @@ class PlaceDetailsViewBodyState extends State<PlaceDetailsViewBody>
     });
     _updateSEOMetaTags();
   }
-
   void _updateSEOMetaTags() {
     final url = Uri.base.toString();
     final title = '${widget.tourModel.title} | On The Go Excursions';

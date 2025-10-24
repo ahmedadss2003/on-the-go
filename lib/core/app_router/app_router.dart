@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:on_the_go/core/models/tour_model.dart';
 import 'package:on_the_go/features/about_us/presentation/pages/about_us_view.dart';
+import 'package:on_the_go/features/contact_us/presentation/pages/contact_us.dart';
 import 'package:on_the_go/features/discover/presentation/views/discover_places_view.dart';
 import 'package:on_the_go/features/home/presentation/view/home_view.dart';
 import 'package:on_the_go/features/place_details/presentation/views/place_details_view.dart';
@@ -54,6 +54,22 @@ final GoRouter router = GoRouter(
           (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const WhyChooseUsView(),
+            transitionsBuilder: (
+              context,
+              animation,
+              secondaryAnimation,
+              child,
+            ) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+    ),
+    GoRoute(
+      path: ContactUsView.routeName,
+      pageBuilder:
+          (context, state) => CustomTransitionPage(
+            key: state.pageKey,
+            child: const ContactUsView(),
             transitionsBuilder: (
               context,
               animation,

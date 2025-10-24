@@ -81,19 +81,15 @@ Future<void> generateSitemap() async {
 
   sitemap.write('</urlset>');
 
-  // 💾 كتابة الملف
   final file = File(sitemapPath);
   await file.writeAsString(sitemap.toString());
   print('✅ Sitemap generated successfully at: ${file.path}');
 }
 
 Future<void> main() async {
-  // ✅ ضروري لتفعيل Firebase في السكربت
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // لو عامل Firebase config
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await generateSitemap();
 }
