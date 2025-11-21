@@ -1,11 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
+
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'dart:ui' as ui;
+import 'dart:ui_web' as ui;
 import 'dart:html' show IFrameElement;
 
 class YoutubeVideoWidget extends StatefulWidget {

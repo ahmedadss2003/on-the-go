@@ -1,4 +1,3 @@
-// features/categories/data/models/category_model.dart (New file)
 class CategoryModel {
   final String id;
   final String name;

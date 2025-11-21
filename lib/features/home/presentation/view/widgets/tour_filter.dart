@@ -628,8 +628,8 @@ class _FilterButtonState extends State<FilterButton>
           scale: _scaleAnimation,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: double.infinity, // Full width for mobile
-            height: isMobile ? 60 : null, // Fixed height for mobile
+            width: double.infinity,
+            height: isMobile ? 60 : null,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors:
